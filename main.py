@@ -56,6 +56,11 @@ def Gammahhh_oneloop_SM_like(x,M):
     
     return G
 
+def Gammahhh_oneloop(x,M,mH,mA,mHpm):
+    G = -(3*mh**2/v)*(1+(3/2)*(1-4*M**2/(3*mh**2))*x**2-3*mt**4/(3*np.pi**2*mh**2*v**2)+(mH**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mH**2))**3+(mA**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mA**2))**3+(mHpm**4/(6*np.pi**2*mh**2*v**2))*(1-M**2/(mHpm**2))**3)
+    
+    return G
+
 x = np.arcsin(0.999)-np.pi/2
 
 #lambdahhh is defined as -Gammahhh
@@ -142,6 +147,10 @@ SM = anyBSM('SM',scheme_name = 'OS')
 
 #%%                         Plot THDM
 
+mA = 300
+mHpm = 550
+mH = 300
+
 ###                         Plot 3
 
 sBmA_std = 0.8
@@ -160,12 +169,14 @@ fig, ax = plt.subplots(figsize=(10, 10))
 
 plt.plot(M_array, Γ,c='k',label='AnyBSM')
 plt.plot(M_array, -Gammahhh_treelevel(np.arcsin(sBmA_std)-np.pi/2, M_array),c='y',label='Kanemura (tree-level)')
-plt.plot(M_array, -Gammahhh_oneloop_SM_like(np.arcsin(sBmA_std)-np.pi/2, M_array),c='orange',label='Kanemura (one-loop)')
+plt.plot(M_array, -Gammahhh_oneloop(np.arcsin(sBmA_std)-np.pi/2, M_array,mH,mA,mHpm),c='orange',label='Kanemura (one-loop)')
 plt.yticks(size=20)
-plt.ylabel(r'$\Gamma$', size=25)
+plt.ylabel(r'$\Gamma$ [GeV]', size=25)
 plt.xticks(size=20)
 plt.xlabel(r'$M$ [GeV]', size=25)
 ax.grid()
+
+plt.legend(fontsize=20)
 
 plt.show()
 
@@ -187,11 +198,13 @@ fig, ax = plt.subplots(figsize=(10, 10))
 
 plt.plot(sBmA_array, Γ,c='k',label='AnyBSM')
 plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M_std),c='y',label='Kanemura (tree-level)')
-plt.plot(sBmA_array, -Gammahhh_oneloop_SM_like(np.arcsin(sBmA_array)-np.pi/2, M_std),c='orange',label='Kanemura (one-loop)')
+plt.plot(sBmA_array, -Gammahhh_oneloop(np.arcsin(sBmA_array)-np.pi/2, M_std,mH,mA,mHpm),c='orange',label='Kanemura (one-loop)')
 plt.yticks(size=20)
-plt.ylabel(r'$\Gamma$', size=25)
+plt.ylabel(r'$\Gamma$ [GeV]', size=25)
 plt.xticks(size=20)
 plt.xlabel(r'$s_{\beta-\alpha}$', size=25)
 ax.grid()
+
+plt.legend(fontsize=20)
 
 plt.show()
