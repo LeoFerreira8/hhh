@@ -11,19 +11,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 SM = anyBSM('SM',scheme_name = 'OS')
-#SM.set_evaluation_mode('numerical')
-# hself = SM.Sigma('h', simplify = False,draw=True) # this returns a string
-# # just convert the string to sympy
-# SM.sympify(hself, simplify = False)
-# # convert to sympy and replace all internal UFO parameters with
-
 THDM1 = anyBSM('THDMI', scheme_name = 'OS')
 THDM2 = anyBSM('THDMII', scheme_name = 'OS')
-#THDM2.set_evaluation_mode('numerical')
-# hself2 = THDM2.Sigma('h', simplify = False,draw=True) # this returns a string
-# # just convert the string to sympy
-# THDM2.sympify(hself2, simplify = True)
-# # convert to sympy and replace all internal UFO parameters with
 
 lamb = SM.lambdahhh()
 lamb1 = THDM1.lambdahhh()
@@ -208,3 +197,69 @@ ax.grid()
 plt.legend(fontsize=20)
 
 plt.show()
+
+#%%                         Plot SM
+
+###                         Plot 5
+
+mh_array = np.linspace(-50,50,101)+mh
+Γ = np.copy(mh_array)
+Γ0 = np.copy(mh_array)
+ΓK = np.copy(mh_array)
+Γ0K = np.copy(mh_array)
+
+for i,x in enumerate(mh_array):
+    SM.setparameters({'Mh': x})
+    lamb = SM.lambdahhh()
+    mh = x
+    Γ[i] = np.abs(lamb["total"])
+    Γ0[i] = np.abs(lamb["treelevel"])
+    ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
+    Γ0K[i] = -Gammahhh_treelevel(0, 0)
+
+#%%
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(mh_array, Γ0,label='AnyBSM (tree-level)',linestyle='dashed')
+plt.plot(mh_array, Γ0K,label='Kanemura (tree-level)',linestyle='dashdot')
+plt.plot(mh_array, Γ,label='AnyBSM (one-loop)')
+plt.plot(mh_array, ΓK,label='Kanemura (one-loop)')
+plt.yticks(size=20)
+plt.ylabel(r'$\delta \Gamma_{(1)} / \Gamma_0$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'SM-Higgs mass $m_h$ [GeV]', size=25)
+ax.grid()
+
+plt.legend(fontsize=20)
+
+plt.show()
+
+mh = mhSM
+SM = anyBSM('SM',scheme_name = 'OS')
+
+###                         Plot 6
+
+mt_array = np.linspace(-50,50,101)+mt
+δΓ = np.copy(mt_array)
+
+for i,x in enumerate(mt_array):
+    SM.setparameters({'Mu3': x})
+    lamb = SM.lambdahhh()
+    mt = x
+    δΓ[i] = (np.abs(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
+
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(mt_array, δΓ)
+plt.yticks(size=20)
+plt.ylabel(r'$\delta \Gamma_{(1)} / \Gamma_0$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'Top-quark mass $m_t$ [GeV]', size=25)
+ax.grid()
+
+plt.show()
+
+mt = mtSM
+SM = anyBSM('SM',scheme_name = 'OS')
