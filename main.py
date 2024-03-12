@@ -61,36 +61,15 @@ print((-lamb["total"]-Gammahhh_oneloop_SM_like(0, 0))/Gammahhh_treelevel(0, 0))
 
 #%% Plots para checar renormalização
 
-###                         Plot 1
+###                         Plot 1 - SM comparison with 1-loop as function of mh
 
-yarray = np.array([0.037,0.0333,0.0314,0.0306,0.0304,0.0308,0.0316,0.0319,0.0328,0.0344,0.0365,0.0397])
-xarray = np.array([60,70,80,90,100,110,120,125.1,130,140,150,160])
-
-plt.rc('text', usetex=True)
-# plt.rc('xtick',labelsize=20)
-# plt.rc('ytick',labelsize=20)
-
-fig, ax = plt.subplots(figsize=(10, 10))
-
-plt.plot(xarray, yarray)
-plt.yticks(size=20)
-plt.ylabel(r'$\delta \Gamma_{(1)} / \Gamma_0$', size=25)
-#plt.ylim((-1,1))
-plt.xticks(size=20)
-plt.xlabel(r'SM-Higgs mass $m_h$ [GeV]', size=25)
-ax.grid()
-
-plt.show()
-
-###                         Plot 1.5
-
-mh_array = np.linspace(-50,50,101)+mh
+mh_array = np.linspace(-50,50,101)+mhSM #Plot mhSM +-50 GeV
 δΓ = np.copy(mh_array)
 
 for i,x in enumerate(mh_array):
-    SM.setparameters({'Mh': x})
-    lamb = SM.lambdahhh()
-    mh = x
+    SM.setparameters({'Mh': x}) #Define new mass in anyBSM
+    lamb = SM.lambdahhh()  #Recalculate lambda
+    mh = x  #Redefine mh globally to recalculate Gamma
     δΓ[i] = (np.abs(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
 
 
@@ -108,9 +87,9 @@ plt.show()
 mh = mhSM
 SM = anyBSM('SM',scheme_name = 'OS')
 
-###                         Plot 2
+###                         Plot 2 - SM comparison with 1-loop as function of mt
 
-mt_array = np.linspace(-50,50,101)+mt
+mt_array = np.linspace(-50,50,101)+mtSM
 δΓ = np.copy(mt_array)
 
 for i,x in enumerate(mt_array):
@@ -134,15 +113,16 @@ plt.show()
 mt = mtSM
 SM = anyBSM('SM',scheme_name = 'OS')
 
-#%%                         Plot THDM
+#%%                         Plots 2HDM
 
-mA = 300
-mHpm = 550
-mH = 300
+#Standard definitions in anyBSM
+mA = 300 #Pseudoscalar mass
+mHpm = 550 #Charged scalar mass
+mH = 300  #Heavy Higgs mass
+sBmA_std = 0.9 #Standard definition of sin(β-α) in anyBSM
+M_std = 200 #Standard definition of M in anyBSM
 
-###                         Plot 3
-
-sBmA_std = 0.8
+###                         Plot 3 - 2HDM 1-loop comparison as function of M
 
 M_array = np.linspace(0,500,100)
 Γ = np.copy(M_array)
@@ -169,9 +149,7 @@ plt.legend(fontsize=20)
 
 plt.show()
 
-###                         Plot 4
-
-M_std = 200
+###                         Plot 4 - 2HDM 1-loop comparison as function of sβα
 
 sBmA_array = np.linspace(0,1,20)
 Γ = np.copy(sBmA_array)
@@ -198,11 +176,11 @@ plt.legend(fontsize=20)
 
 plt.show()
 
-#%%                         Plot SM
+#%%                         Plots SM - Tree and 1-loop level comparison in OS scheme
 
-###                         Plot 5
+###                         Plot 5 - As function of mh
 
-mh_array = np.linspace(-50,50,101)+mh
+mh_array = np.linspace(-50,50,101)+mhSM
 Γ = np.copy(mh_array)
 Γ0 = np.copy(mh_array)
 ΓK = np.copy(mh_array)
@@ -239,11 +217,11 @@ plt.show()
 mh = mhSM
 SM = anyBSM('SM',scheme_name = 'OS')
 
-#%%                         Plot SM
+#%%                         Plot SM - Tree and 1-loop level comparison in OS scheme
 
-###                         Plot 6
+###                         Plot 6 - As function of mt
 
-mt_array = np.linspace(-50,50,101)+mt
+mt_array = np.linspace(-50,50,101)+mtSM
 Γ = np.copy(mt_array)
 Γ0 = np.copy(mt_array)
 ΓK = np.copy(mt_array)
@@ -280,13 +258,13 @@ plt.show()
 mt = mtSM
 SM = anyBSM('SM',scheme_name = 'OS')
 
-#%%                         Plot SM
+#%%                         Plot SM - Tree and 1-loop level comparison in MS scheme
 
 SM = anyBSM('SM',scheme_name = 'MS')
 
-###                         Plot 5
+###                         Plot 5 - As function of mh
 
-mh_array = np.linspace(-50,50,101)+mh
+mh_array = np.linspace(-50,50,101)+mhSM
 Γ = np.copy(mh_array)
 Γ0 = np.copy(mh_array)
 ΓK = np.copy(mh_array)
@@ -321,15 +299,14 @@ plt.legend(fontsize=20)
 plt.show()
 
 mh = mhSM
-SM = anyBSM('SM',scheme_name = 'OS')
 
-#%%                         Plot SM
+#%%                         Plot SM - Tree and 1-loop level comparison in MS scheme
 
 SM = anyBSM('SM',scheme_name = 'MS')
 
-###                         Plot 6
+###                         Plot 6 - As function of mt
 
-mt_array = np.linspace(-50,50,101)+mt
+mt_array = np.linspace(-50,50,101)+mtSM
 Γ = np.copy(mt_array)
 Γ0 = np.copy(mt_array)
 ΓK = np.copy(mt_array)
@@ -364,4 +341,130 @@ plt.legend(fontsize=20)
 plt.show()
 
 mt = mtSM
-SM = anyBSM('SM',scheme_name = 'OS')
+
+#%%                         Plot SM - Tree and 1-loop level comparison in MS scheme (varying the scale as well)
+
+SM = anyBSM('SM',scheme_name = 'MS')
+
+###                         Plot 7 - As function of mt
+
+mt_array = np.linspace(-50,50,101)+mtSM
+Γ = np.copy(mt_array)
+Γ0 = np.copy(mt_array)
+ΓK = np.copy(mt_array)
+Γ0K = np.copy(mt_array)
+
+for i,x in enumerate(mt_array):
+    SM.setparameters({'Mu3': x})
+    SM.setparameters(params={'Qren': x}) #Varying the RS
+    lamb = SM.lambdahhh()
+    mt = x
+    Γ[i] = np.abs(lamb["total"])
+    Γ0[i] = np.abs(lamb["treelevel"])
+    ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
+    Γ0K[i] = -Gammahhh_treelevel(0, 0)
+    
+#%%
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(mt_array, Γ0,label='AnyBSM (tree-level)',linestyle='dashed')
+plt.plot(mt_array, Γ0K,label='Kanemura (tree-level)',linestyle='dashdot')
+plt.plot(mt_array, Γ,label='AnyBSM (one-loop)')
+plt.plot(mt_array, ΓK,label='Kanemura (one-loop)')
+plt.yticks(size=20)
+plt.ylabel(r'$\Gamma$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'Top-quark mass $m_t$ [GeV]', size=25)
+ax.grid()
+plt.title('SM - MS Scheme (scale variation)', size=25)
+
+plt.legend(fontsize=20)
+
+plt.show()
+
+mt = mtSM
+
+#%%                         Plot SM - Tree and 1-loop level comparison in MS scheme (varying the scale as well)
+
+SM = anyBSM('SM',scheme_name = 'MS')
+
+###                         Plot 8 - As function of mh
+
+mh_array = np.linspace(-50,150,101)+mhSM
+Γ = np.copy(mh_array)
+Γ0 = np.copy(mh_array)
+ΓK = np.copy(mh_array)
+Γ0K = np.copy(mh_array)
+
+for i,x in enumerate(mh_array):
+    SM.setparameters({'Mh': x})
+    SM.setparameters(params={'Qren': x})
+    lamb = SM.lambdahhh()
+    mh = x
+    Γ[i] = np.abs(lamb["total"])
+    Γ0[i] = np.abs(lamb["treelevel"])
+    ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
+    Γ0K[i] = -Gammahhh_treelevel(0, 0)
+
+#%%
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(mh_array, Γ0,label='AnyBSM (tree-level)',linestyle='dashed')
+plt.plot(mh_array, Γ0K,label='Kanemura (tree-level)',linestyle='dashdot')
+plt.plot(mh_array, Γ,label='AnyBSM (one-loop)')
+plt.plot(mh_array, ΓK,label='Kanemura (one-loop)')
+plt.yticks(size=20)
+plt.ylabel(r'$\Gamma$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'SM-Higgs mass $m_h$ [GeV]', size=25)
+ax.grid()
+plt.title('SM - MS Scheme (scale variation)', size=25)
+
+plt.legend(fontsize=20)
+
+plt.show()
+
+mh = mhSM
+
+#%%                         Plot SM - Tree and 1-loop level comparison in MS scheme (varying the scale as well)
+
+SM = anyBSM('SM',scheme_name = 'MS')
+
+###                         Plot 9 - As function of the scale
+
+mh_array = np.linspace(-50,200,101)+mh
+Γ = np.copy(mh_array)
+Γ0 = np.copy(mh_array)
+ΓK = np.copy(mh_array)
+Γ0K = np.copy(mh_array)
+
+for i,x in enumerate(mh_array):
+    SM.setparameters(params={'Qren': x})
+    lamb = SM.lambdahhh()
+    Γ[i] = np.abs(lamb["total"])
+    Γ0[i] = np.abs(lamb["treelevel"])
+    ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
+    Γ0K[i] = -Gammahhh_treelevel(0, 0)
+
+#%%
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(mh_array, Γ0,label='AnyBSM (tree-level)',linestyle='dashed')
+plt.plot(mh_array, Γ0K,label='Kanemura (tree-level)',linestyle='dashdot')
+plt.plot(mh_array, Γ,label='AnyBSM (one-loop)')
+plt.plot(mh_array, ΓK,label='Kanemura (one-loop)')
+plt.yticks(size=20)
+plt.ylabel(r'$\Gamma$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'$\mu$ [GeV]', size=25)
+ax.grid()
+plt.title('SM - MS Scheme', size=25)
+
+plt.legend(fontsize=20)
+
+plt.show()
+
+mh = mhSM
