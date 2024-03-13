@@ -70,7 +70,7 @@ for i,x in enumerate(mh_array):
     SM.setparameters({'Mh': x}) #Define new mass in anyBSM
     lamb = SM.lambdahhh()  #Recalculate lambda
     mh = x  #Redefine mh globally to recalculate Gamma
-    δΓ[i] = (np.abs(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
+    δΓ[i] = (np.real(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
 
 
 fig, ax = plt.subplots(figsize=(10, 10))
@@ -89,14 +89,14 @@ SM = anyBSM('SM',scheme_name = 'OS')
 
 ###                         Plot 2 - SM comparison with 1-loop as function of mt
 
-mt_array = np.linspace(-50,50,101)+mtSM
+mt_array = np.linspace(-50,450,101)+mtSM
 δΓ = np.copy(mt_array)
 
 for i,x in enumerate(mt_array):
     SM.setparameters({'Mu3': x})
     lamb = SM.lambdahhh()
     mt = x
-    δΓ[i] = (np.abs(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
+    δΓ[i] = (np.real(lamb["total"])-(-Gammahhh_oneloop_SM_like(0, 0)))/(-Gammahhh_treelevel(0, 0))
 
 
 fig, ax = plt.subplots(figsize=(10, 10))
@@ -132,7 +132,7 @@ THDM2.setparameters({'SinBmA': sBmA_std})
 for i,x in enumerate(M_array):
     THDM2.setparameters({'M': x})
     lamb = THDM2.lambdahhh()
-    Γ[i] = np.abs(lamb["total"])
+    Γ[i] = np.real(lamb["total"])
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
@@ -159,7 +159,7 @@ THDM2.setparameters({'M': M_std})
 for i,x in enumerate(sBmA_array):
     THDM2.setparameters({'SinBmA': x})
     lamb = THDM2.lambdahhh()
-    Γ[i] = np.abs(lamb["total"])
+    Γ[i] = np.real(lamb["total"])
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
@@ -190,8 +190,8 @@ for i,x in enumerate(mh_array):
     SM.setparameters({'Mh': x})
     lamb = SM.lambdahhh()
     mh = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
 
@@ -221,7 +221,7 @@ SM = anyBSM('SM',scheme_name = 'OS')
 
 ###                         Plot 6 - As function of mt
 
-mt_array = np.linspace(-50,50,101)+mtSM
+mt_array = np.linspace(-50,450,101)+mtSM
 Γ = np.copy(mt_array)
 Γ0 = np.copy(mt_array)
 ΓK = np.copy(mt_array)
@@ -231,8 +231,8 @@ for i,x in enumerate(mt_array):
     SM.setparameters({'Mu3': x})
     lamb = SM.lambdahhh()
     mt = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
     
@@ -274,8 +274,8 @@ for i,x in enumerate(mh_array):
     SM.setparameters({'Mh': x})
     lamb = SM.lambdahhh()
     mh = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
 
@@ -316,8 +316,8 @@ for i,x in enumerate(mt_array):
     SM.setparameters({'Mu3': x})
     lamb = SM.lambdahhh()
     mt = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
     
@@ -359,8 +359,8 @@ for i,x in enumerate(mt_array):
     SM.setparameters(params={'Qren': x}) #Varying the RS
     lamb = SM.lambdahhh()
     mt = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
     
@@ -402,8 +402,8 @@ for i,x in enumerate(mh_array):
     SM.setparameters(params={'Qren': x})
     lamb = SM.lambdahhh()
     mh = x
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
 
@@ -443,8 +443,8 @@ mh_array = np.linspace(-50,200,101)+mh
 for i,x in enumerate(mh_array):
     SM.setparameters(params={'Qren': x})
     lamb = SM.lambdahhh()
-    Γ[i] = np.abs(lamb["total"])
-    Γ0[i] = np.abs(lamb["treelevel"])
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
     ΓK[i] = -Gammahhh_oneloop_SM_like(0, 0)
     Γ0K[i] = -Gammahhh_treelevel(0, 0)
 
