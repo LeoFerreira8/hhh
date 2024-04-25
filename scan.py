@@ -32,7 +32,12 @@ def Gammahhh_treelevel(x,M):
 
 #%%
 
+<<<<<<< HEAD
+THDM2 = anyBSM('THDMII', scheme_name = 'OSalignment')
+THDM2.setparameters({'SinBmA': 1}) #Define new mass in anyBSM
+=======
 THDM2 = anyBSM('THDMII', scheme_name = 'OS')
+>>>>>>> 76513f119c9adf2eba2395253245bc9b38e6e7ea
 
 mA_array = np.linspace(200,800,35) #Plot mA GeV
 mH_array = np.linspace(200,800,36)
