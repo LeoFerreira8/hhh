@@ -11,6 +11,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scan_parameterspace_funcs as fcs
 import pandas as pd
+import gc
 
 def perturbativity_bounds(l):
     '''Returns True if coupling l is above the perturbativity bound, and False otherwise.'''
@@ -22,17 +23,17 @@ def perturbativity_bounds(l):
 def stability_bounds(l_a):
     '''Returns True if array of couplings l_a does not comply with the stability bounds, and False otherwise.'''
     res = np.where(
-        (l_a[0] > 0) & 
-        (l_a[1] > 0) & 
-        (-np.sqrt(l_a[0]*l_a[1]) < l_a[2]) & 
-        (l_a[2]+l_a[3]-np.abs(l_a[4]) > -np.sqrt(l_a[0]*l_a[1]))
+        (l_a[0] > 0) 
+        & (l_a[1] > 0) 
+        & (-np.sqrt(l_a[0]*l_a[1]) < l_a[2]) 
+        & (l_a[2]+l_a[3]-np.abs(l_a[4]) > -np.sqrt(l_a[0]*l_a[1]))
         ,False,True)
     
     return res
     
 #%%
 
-N_points = int(1e5)
+N_points = int(1e3)
 
 Table = fcs.find_random_points(N_points)
 
@@ -56,6 +57,7 @@ l5 = fcs.lamb5(Table['mA'], m122, sb, cb, v, lambda6, lambda7)
 Table1 = pd.DataFrame(np.array([m122,l1,l2,l3,l4,l5]).T,columns=['m122','l1','l2','l3','l4','l5'])
 
 Table = pd.concat([Table,Table1],axis=1)
+Table1 = None
 
 #%%                                 Analysis
 
@@ -76,8 +78,11 @@ TableStab = Table.drop(Table[cnd].index)
 
 cnd = stability_bounds([TableP['l'+str(i)] for i in range(1,6)])
 TableTot = TableP.drop(TableP[cnd].index)
+TableTot.reset_index()
 
-#THDM2 = anyBSM('THDMII', scheme_name = 'OS')
+#Table = None
+
+gc.collect()
 
 #%%                         Calculate lambda
 
@@ -85,18 +90,23 @@ lamb = []
 lambtree = []
 
 for i in TableTot.index:
-    sino = np.sin(np.arccos(TableTot.at[i,'cosa'])-np.arctan(TableTot.at[i,'tanb']))
+    sino = np.sin(fcs.beta(TableTot.at[i,'tanb'])-fcs.alpha(TableTot.at[i,'cosa']))
     if sino == 1:
         THDM2 = anyBSM('THDMII', scheme_name = 'OSalignment')
     else:
         THDM2 = anyBSM('THDMII', scheme_name = 'OS')
         
-    THDM2.setparameters({'Mh2': TableTot.at[i,'mH'], 'MAh2': TableTot.at[i,'mA'], 'MHm2': TableTot.at[i,'mHpm'], 'TanBeta': TableTot.at[i,'tanb'], 'SinBmA': sino}) #Define new mass in anyBSM
+    THDM2.setparameters({'Mh2': TableTot.at[i,'mH'], 'MAh2': TableTot.at[i,'mA'], 'MHm2': TableTot.at[i,'mHpm'], 'TanBeta': TableTot.at[i,'tanb'], 'SinBmA': sino,'M': TableTot.at[i,'M']}) #Define new mass in anyBSM
     dic = THDM2.lambdahhh()
     lamb.append(-np.real(dic['total'])/fcs.Gammahhh_treelevel(0, 0))  #Recalculate lambda
     lambtree.append(-np.real(dic['treelevel'])/fcs.Gammahhh_treelevel(0, 0))  #Recalculate lambda
     
-TableTot = pd.concat([TableTot.reset_index(),pd.DataFrame({'kappa': lamb, 'kappa-tree': lambtree})],axis=1)
+sino = np.sin(fcs.beta(TableTot['tanb'])-fcs.alpha(TableTot['cosa']))
+# Using that sinBmA ~ 1-x²/2
+kappa_kan_x = fcs.Gammahhh_oneloop(np.sqrt(2*(1-sino)), TableTot['M'], TableTot['mH'], TableTot['mA'], TableTot['mHpm'])/fcs.Gammahhh_treelevel(0, 0)
+kappa_kan = fcs.Gammahhh_oneloop_cos(fcs.beta(TableTot['tanb'])-fcs.alpha(TableTot['cosa']), fcs.beta(TableTot['tanb']), TableTot['M'], TableTot['mH'], TableTot['mA'], TableTot['mHpm'])/fcs.Gammahhh_treelevel(0, 0)
+    
+TableTot = pd.concat([TableTot,pd.DataFrame({'kappa': lamb, 'kappa-tree': lambtree, 'kappa-kan-x': kappa_kan_x, 'kappa-kan': kappa_kan})],axis=1)
 
 #%%                                 Plots
 
@@ -138,11 +148,16 @@ def plotter_2(param1,param2):
 
     fig, ax = plt.subplots(figsize=(10, 10))
     
-    plt.scatter(TableTot[param1],TableTot[param2])
+    #plt.scatter(Table[param1],Table[param2],c='b')
+    #plt.scatter(TableP[param1],TableP[param2],c='r')
+    #plt.scatter(TableStab[param1],TableStab[param2],c='b')
+    plt.scatter(TableTot[param1],TableTot[param2],c='k')
     plt.xlabel(str_to_tex(param1), size=25)
     plt.xticks(size=20)
+    #plt.xlim(125,900)
     plt.ylabel(str_to_tex(param2), size=25)
     plt.yticks(size=20)
+    #plt.ylim(125,900)
     ax.grid()
     
     plt.show()
