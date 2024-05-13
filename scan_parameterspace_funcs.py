@@ -42,7 +42,7 @@ cosa_min = -1
 cosa_max = 1
 
 tanb_min = 1.5
-tanb_max = 5
+tanb_max = 40
 
 M_min = 1e2
 M_max = 1e3
