@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import scan_parameterspace_funcs as fcs
 import pandas as pd
 import gc
+import scipy.interpolate as scpint
 
 def perturbativity_bounds(l):
     '''Returns True if coupling l is above the perturbativity bound, and False otherwise.'''
@@ -33,7 +34,7 @@ def stability_bounds(l_a):
     
 #%%
 
-N_points = int(1e3)
+N_points = int(1e4)
 
 Table = fcs.find_random_points(N_points)
 
@@ -111,7 +112,7 @@ TableTot = pd.concat([TableTot,pd.DataFrame({'kappa': lamb, 'kappa-tree': lambtr
 #%%                                 Plots
 
 def str_to_tex(strg):
-    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$']
+    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\kappa_\lambda^{\text{Kan. Aprox}}$',r'$\kappa_\lambda^{\text{Kan}}$']
     
     if strg=='mA':
         return latex_parameters[0]
@@ -141,6 +142,10 @@ def str_to_tex(strg):
         return latex_parameters[12]
     elif strg=='kappa-tree':
         return latex_parameters[13]
+    elif strg=='kappa-kan-x':
+        return latex_parameters[14]
+    elif strg=='kappa-kan':
+        return latex_parameters[15]
     else:
         raise ValueError("Invalid parameter.")
     
@@ -158,6 +163,96 @@ def plotter_2(param1,param2):
     plt.ylabel(str_to_tex(param2), size=25)
     plt.yticks(size=20)
     #plt.ylim(125,900)
+    ax.grid()
+    
+    plt.show()
+
+    return 0
+
+def plotter_cont(param1,param2,param3):
+    
+    x,y = np.meshgrid(TableTot[param1],TableTot[param2])
+    
+    z = scpint.griddata((TableTot[param1],TableTot[param2]),TableTot[param3],(x,y))
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    
+    #plt.scatter(Table[param1],Table[param2],c='b')
+    #plt.scatter(TableP[param1],TableP[param2],c='r')
+    #plt.scatter(TableStab[param1],TableStab[param2],c='b')
+    plt.contourf(x,y,z)
+    plt.colorbar()
+    plt.xlabel(str_to_tex(param1), size=25)
+    plt.xticks(size=20)
+    #plt.xlim(125,900)
+    plt.ylabel(str_to_tex(param2), size=25)
+    plt.yticks(size=20)
+    #plt.ylim(125,900)
+    ax.grid()
+    
+    plt.show()
+
+    return 0
+
+def plotter_3(param1,param2,param3):
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    
+    #plt.scatter(Table[param1],Table[param2],c='b')
+    #plt.scatter(TableP[param1],TableP[param2],c='r')
+    #plt.scatter(TableStab[param1],TableStab[param2],c='b')
+    plt.scatter(TableTot[param1],TableTot[param2],c=TableTot[param3])
+    plt.colorbar()
+    plt.xlabel(str_to_tex(param1), size=25)
+    plt.xticks(size=20)
+    #plt.xlim(125,900)
+    plt.ylabel(str_to_tex(param2), size=25)
+    plt.yticks(size=20)
+    #plt.ylim(125,900)
+    ax.grid()
+    
+    plt.show()
+
+    return 0
+
+def plotter_comp(param1,param2,param3,param4):
+
+    ratio = TableTot[param3]/TableTot[param4]    
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    
+    #plt.scatter(Table[param1],Table[param2],c='b')
+    #plt.scatter(TableP[param1],TableP[param2],c='r')
+    #plt.scatter(TableStab[param1],TableStab[param2],c='b')
+    plt.scatter(TableTot[param1],TableTot[param2],c=ratio)
+    plt.colorbar()
+    plt.xlabel(str_to_tex(param1), size=25)
+    plt.xticks(size=20)
+    #plt.xlim(125,900)
+    plt.ylabel(str_to_tex(param2), size=25)
+    plt.yticks(size=20)
+    #plt.ylim(125,900)
+    ax.grid()
+    
+    plt.show()
+
+    return 0
+
+def plotter_4(param1,param2,param3,param4,param5):
+
+    fig, ax = plt.subplots(figsize=(10, 10))
+    
+    #plt.scatter(Table[param1],Table[param2],c='b')
+    #plt.scatter(TableP[param1],TableP[param2],c='r')
+    #plt.scatter(TableStab[param1],TableStab[param2],c='b')
+    plt.scatter(TableTot[param1]-TableTot[param2],TableTot[param3]-TableTot[param4],c=TableTot[param5])
+    plt.colorbar()
+    plt.xlabel(str_to_tex(param1)+'-'+str_to_tex(param2), size=25)
+    plt.xticks(size=20)
+    #plt.xlim(-200,200)
+    plt.ylabel(str_to_tex(param3)+'-'+str_to_tex(param4), size=25)
+    plt.yticks(size=20)
+    #plt.ylim(-200,200)
     ax.grid()
     
     plt.show()

@@ -83,7 +83,7 @@ def find_random_points(N):
         DataFrame['mH'] = mH_min+numb[1]*(mH_max-mH_min)
         DataFrame['mHpm'] = mHpm_min+numb[2]*(mHpm_max-mHpm_min)
         DataFrame['tanb'] = tanb_min+numb[4]*(tanb_max-tanb_min)
-        DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-(np.pi/2)*(1+np.random.choice([-1,1],size=N)*numb[3]*non_alignment_max))
+        DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-(np.pi/2)+np.random.choice([-1,1],size=N)*numb[3]*non_alignment_max)
         #DataFrame['M'] = 10**(3+numb[5]*(7-3))
         if small_l5:
             DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),vSM,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
