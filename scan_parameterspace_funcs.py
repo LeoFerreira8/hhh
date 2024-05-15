@@ -9,7 +9,7 @@ Created on Mon Apr 22 11:09:52 2024
 import pandas as pd
 import numpy as np
 
-alignment = False
+alignment = True
 small_l5 = True
 l5_size_max = 1e-10
 non_alignment_max = 0.2
@@ -22,8 +22,9 @@ mt = mtSM
 alphaQED = 137.035999679
 
 e = 2*np.sqrt(np.pi/(alphaQED))
-vSM = 2*MW*np.sqrt(1-MW**2/MZ**2)/e
-v = vSM
+#vSM = 2*MW*np.sqrt(1-MW**2/MZ**2)/e
+#v = vSM
+v = 245.20
 mhSM = 125.1 #GeV
 mh = mhSM
 ### ----------
@@ -86,7 +87,7 @@ def find_random_points(N):
         DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-(np.pi/2)+np.random.choice([-1,1],size=N)*numb[3]*non_alignment_max)
         #DataFrame['M'] = 10**(3+numb[5]*(7-3))
         if small_l5:
-            DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),vSM,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
+            DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),v,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
         else:
             DataFrame['M'] = M_min+numb[5]*(M_max-M_min)
     else:
@@ -101,7 +102,7 @@ def find_random_points(N):
         DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-np.pi/2)
         #DataFrame['M'] = 10**(3+numb[5]*(7-3))
         if small_l5:
-            DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),vSM,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
+            DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),v,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
         else:
             DataFrame['M'] = M_min+numb[5]*(M_max-M_min)
         

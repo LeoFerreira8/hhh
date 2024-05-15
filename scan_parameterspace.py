@@ -13,6 +13,7 @@ import scan_parameterspace_funcs as fcs
 import pandas as pd
 import gc
 import scipy.interpolate as scpint
+import scan_SPheno_funcs as SPfcs
 
 def perturbativity_bounds(l):
     '''Returns True if coupling l is above the perturbativity bound, and False otherwise.'''
@@ -31,10 +32,34 @@ def stability_bounds(l_a):
         ,False,True)
     
     return res
+
+def Spheno_calc_(SPheno_input):
+    outpt=pd.DataFrame()
+    for index, row in SPheno_input.iterrows():
+        SPfcs.write_spheno_LHA(list(row))
+        success = SPfcs.execute_spheno()
+        if success:
+            outpt = pd.concat([outpt,SPfcs.read_spheno_obs()])
+        else:
+            print('SPheno could not calculate %d' %index)
+            proxrow = np.copy(row)
+            proxrow[5]=-proxrow[5]
+            SPfcs.write_spheno_LHA(list(proxrow))
+            success = SPfcs.execute_spheno()
+            if success:
+                outpt = pd.concat([outpt,SPfcs.read_spheno_obs()])
+                print('Calculation of %d successful.' %index)
+            else:
+                print('Failed')
+            
+    outpt = outpt.drop_duplicates()
+    
+    return outpt
+
     
 #%%
 
-N_points = int(1e4)
+N_points = int(2e3)
 
 Table = fcs.find_random_points(N_points)
 
@@ -44,7 +69,7 @@ sa = np.sin(fcs.alpha(Table['cosa']))
 ca = Table['cosa']
 
 mh = fcs.mhSM
-v = fcs.vSM
+v = fcs.v
 lambda6 = 0
 lambda7 = 0
 
@@ -108,6 +133,17 @@ kappa_kan_x = fcs.Gammahhh_oneloop(np.sqrt(2*(1-sino)), TableTot['M'], TableTot[
 kappa_kan = fcs.Gammahhh_oneloop_cos(fcs.beta(TableTot['tanb'])-fcs.alpha(TableTot['cosa']), fcs.beta(TableTot['tanb']), TableTot['M'], TableTot['mH'], TableTot['mA'], TableTot['mHpm'])/fcs.Gammahhh_treelevel(0, 0)
     
 TableTot = pd.concat([TableTot,pd.DataFrame({'kappa': lamb, 'kappa-tree': lambtree, 'kappa-kan-x': kappa_kan_x, 'kappa-kan': kappa_kan})],axis=1)
+
+#%%                                 Calculate S,T,U constraints
+
+Sp_in = TableTot.T.loc[['l1','l2','l3','l4','l5','m122','tanb']].T
+Sp_in['m122'] = -Sp_in['m122'] # Different convention from SPheno.
+Sp_in['l1'] = Sp_in['l1']/2 # Different convention from SPheno.
+Sp_in['l2'] = Sp_in['l2']/2 # Different convention from SPheno.
+Sp_in = Sp_in.rename({'m122': 'm12'},axis=1) # Fixed name with SPheno.
+
+STU = Spheno_calc_(Sp_in)
+
 
 #%%                                 Plots
 
