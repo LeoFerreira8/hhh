@@ -11,14 +11,15 @@ import fileinput
 from subprocess import run
 from contextlib import chdir
 import datetime
+import scan_parameterspace_funcs as fcs
 
 Spheno_path = '/home/leo/Documents/Unicamp/HEPTools/SPheno/'
 keep_log = False
 
 def write_spheno_LHA(par_list):
-    '''Input parameters for SPheno for THDM-II. The parameters are lambda1,lambda2,lambda3,lambda4,lambda5,m12 and tan(beta).'''
+    '''Input parameters for SPheno for THDM. The parameters are lambda1,lambda2,lambda3,lambda4,lambda5,m12 and tan(beta).'''
     
-    file = fileinput.input(Spheno_path+"LesHouches.in.THDMII",inplace=True)
+    file = fileinput.input(Spheno_path+"LesHouches.in.THDM"+fcs.THDM_type,inplace=True)
     block = 0
     
     # The block for input in SPheno looks like:
@@ -61,7 +62,7 @@ def write_spheno_LHA(par_list):
             
 def execute_spheno():
     with chdir(Spheno_path):
-        first_call=run(["bin/SPhenoTHDMII","LesHouches.in.THDMII"],capture_output=True)
+        first_call=run(["bin/SPhenoTHDM"+fcs.THDM_type,"LesHouches.in.THDM"+fcs.THDM_type],capture_output=True)
         
         if keep_log:
             fil = open("./logs/SPhen_log"+str(datetime.datetime.now()),'w')
@@ -76,7 +77,7 @@ def execute_spheno():
             return 0
         
 def read_spheno_obs():
-    f = open(Spheno_path+"SPheno.spc.THDMII",'r')
+    f = open(Spheno_path+"SPheno.spc.THDM"+fcs.THDM_type,'r')
     text = f.readlines()[27:]
     dt_in=pd.DataFrame()
     dt_el=pd.DataFrame()

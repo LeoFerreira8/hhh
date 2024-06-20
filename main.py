@@ -14,7 +14,7 @@ SM = anyBSM('SM',scheme_name = 'OS')
 THDM1 = anyBSM('THDMI', scheme_name = 'OS')
 THDM2 = anyBSM('THDMII', scheme_name = 'OS')
 
-THDM2.setparameters({'MAh2': 100, 'MHm2': 300, 'Mh2': 125.6, 'M': 300, 'SinBmA': 0, 'TanBeta': 2, 'Mh1': 300}) #Define new mass in anyBSM
+THDM2.setparameters({'MAh2': 200, 'MHm2': 800, 'Mh2': 800, 'M': 200, 'SinBmA': 0.8, 'TanBeta': 40, 'Mh1': 125.6}) #Define new mass in anyBSM
 
 lamb = SM.lambdahhh()
 lamb1 = THDM1.lambdahhh()
@@ -144,7 +144,7 @@ else:
     scheme_str = 'OS'
     
 
-THDM2 = anyBSM('THDMII', scheme_name = scheme_str)
+THDM2 = anyBSM('THDMI', scheme_name = scheme_str)
 THDM2.setparameters({'MAh2': mA, 'MHm2': mHpm, 'Mh2': mH, 'M': M, 'SinBmA': sBmA, 'TanBeta': np.tan(Beta)}) #Define new mass in anyBSM
 
 for i,x in enumerate(M_array):
@@ -176,7 +176,7 @@ plt.show()
 sBmA_array = np.linspace(0,1,20,endpoint=False)
 Γ = np.copy(sBmA_array)
 Γ0 = np.copy(sBmA_array)
-THDM2 = anyBSM('THDMII', scheme_name = 'OS')
+THDM2 = anyBSM('THDMI', scheme_name = 'OS')
 THDM2.setparameters({'MAh2': mA, 'MHm2': mHpm, 'Mh2': mH, 'M': M, 'SinBmA': sBmA, 'TanBeta': np.tan(Beta)}) #Define new mass in anyBSM
 
 for i,x in enumerate(sBmA_array):
@@ -202,6 +202,52 @@ ax.grid()
 plt.legend(fontsize=20)
 
 plt.show()
+
+#%%%
+
+###                         Plot 5 - 2HDM 1-loop comparison as function of tanb
+
+#Standard definitions in anyBSM
+mA = 200 #Pseudoscalar mass
+mHpm = 200 #Charged scalar mass
+mH = 200  #Heavy Higgs mass
+sBmA = 0.8 #Standard definition of sin(β-α) in anyBSM
+M = 200 #Standard definition of M in anyBSM
+BmA = np.arcsin(sBmA)
+Beta = np.arctan(2)
+
+
+sBmA_array = np.linspace(0.8,40,40)
+Γ = np.copy(sBmA_array)
+Γ0 = np.copy(sBmA_array)
+THDM2 = anyBSM('THDMI', scheme_name = 'OSalignment')
+THDM2.setparameters({'MAh2': mA, 'MHm2': mHpm, 'Mh2': mH, 'M': M, 'SinBmA': sBmA, 'TanBeta': np.tan(Beta)}) #Define new mass in anyBSM
+
+for i,x in enumerate(sBmA_array):
+    THDM2.setparameters({'TanBeta': x})
+    lamb = THDM2.lambdahhh()
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
+
+fig, ax = plt.subplots(figsize=(10, 10))
+
+plt.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
+plt.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
+#plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) Approx',ls='dashed')
+#plt.plot(sBmA_array, -Gammahhh_oneloop(np.arcsin(sBmA_array)-np.pi/2, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) Approx',ls='dashed')
+plt.plot(sBmA_array, -Gammahhh_treelevel_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M)/lambdahhhSM,c='y',label='Kanemura (tree-level)',ls='dashdot')
+plt.plot(sBmA_array, -Gammahhh_oneloop_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop)')
+plt.yticks(size=20)
+plt.ylabel(r'$\kappa_\lambda$', size=25)
+plt.xticks(size=20)
+plt.xlabel(r'$\tan{\beta}$', size=25)
+ax.grid()
+
+plt.legend(fontsize=20)
+
+plt.show()
+
+#%%
 
 # #%%                         Plots SM - Tree and 1-loop level comparison in OS scheme
 

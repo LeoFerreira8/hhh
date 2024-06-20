@@ -10,9 +10,10 @@ import pandas as pd
 import numpy as np
 
 alignment = True
-small_l5 = True
-l5_size_max = 1e-10
+small_l5 = False
+l5_size_max = 1e-8
 non_alignment_max = 0.2
+THDM_type=''
 
 ### ---------      SM param
 MW = 80.379
@@ -42,7 +43,7 @@ mHpm_max = 1000
 cosa_min = -1
 cosa_max = 1
 
-tanb_min = 1.5
+tanb_min = 0.8
 tanb_max = 40
 
 M_min = 1e2
