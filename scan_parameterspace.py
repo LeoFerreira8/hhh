@@ -14,6 +14,7 @@ import pandas as pd
 import gc
 import scan_SPheno_funcs as SPfcs
 import scan_higgs_tools_funcs as hggfcs
+import bsg
 from scipy import stats
 from multiprocessing import Pool
 
@@ -24,8 +25,10 @@ if THDM_type=='':
     THDM_type='THDMI'
 elif THDM_type=='II' and not fcs.small_l5:
     latex_model = '2HDM - Type II'
+    THDM_type='THDMII'
 elif THDM_type=='II' and fcs.small_l5:
     latex_model = '2HDM - 331 EFT'
+    THDM_type='THDMII'
     
 if fcs.alignment:
     latex_alignment = r'($\beta-\alpha=\frac{\pi}{2}$)'
@@ -113,7 +116,7 @@ def signals_const(chisq):
     
 #%%
 
-N_points = int(5e6)
+N_points = int(5e4)
 
 Table = fcs.find_random_points(N_points)
 
@@ -233,6 +236,11 @@ TableTot_STU_Collid = TableTot_STU.drop(TableTot_STU[cnd].index)
 
 cnd = signals_const(np.array(TableTot_STU_Collid['HiggsS'],dtype=float))
 TableTot_STU_Collid = TableTot_STU_Collid.drop(TableTot_STU_Collid[cnd].index)
+
+#%%                                 Impose bounds from BSG
+
+cnd = bsg.Constraints_BSG(np.array(TableTot_STU_Collid['tanb'],dtype=float), np.array(TableTot_STU_Collid['mHpm'],dtype=float))
+TableTot_STU_Collid_BSG = TableTot_STU_Collid.drop(TableTot_STU_Collid[cnd].index)
 
 #%%                             Save data
 

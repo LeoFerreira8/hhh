@@ -13,7 +13,7 @@ alignment = True
 small_l5 = False
 l5_size_max = 1e-8
 non_alignment_max = 0.2
-THDM_type=''
+THDM_type='II'
 
 ### ---------      SM param
 MW = 80.379
