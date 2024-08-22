@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon Apr 22 11:09:52 2024
 
@@ -13,10 +11,11 @@ alignment = True
 small_l5 = False
 l5_size_max = 1e-8
 non_alignment_max = 0.2
-THDM_type='II'
+THDM_type=''
+MW = 'PDG 2024'
 
 ### ---------      SM param
-MW = 80.379
+MW = 80.3692 #PDG world average 2024
 MZ = 91.187
 mtSM = 172.5
 mt = mtSM
@@ -32,13 +31,13 @@ mh = mhSM
 
 ### ----------      intervals
 mA_min = 125
-mA_max = 1000
+mA_max = 1500
 
 mH_min = 125
-mH_max = 1000
+mH_max = 1500
 
 mHpm_min = 125
-mHpm_max = 1000
+mHpm_max = 1500
 
 cosa_min = -1
 cosa_max = 1
@@ -47,7 +46,7 @@ tanb_min = 0.8
 tanb_max = 40
 
 M_min = 1e2
-M_max = 1e3
+M_max = 5e3
 ### ----------
 
 def Gammahhh_treelevel(x,M):
@@ -71,6 +70,13 @@ def Gammahhh_oneloop_cos(ba,b,M,mH,mA,mHpm):
     
     return G
 
+def Gammahhh_oneloop_cos_correc_coup(ba,b,M,mH,mA,mHpm):
+    R47 = (np.sin(ba)*(2*mA**2-mh**2)+((np.cos(ba)*(1-np.tan(b)**2))/(2*np.tan(b))+np.sin(ba))*(2*mh**2-(M**2-mA**2)))/(mA**2+mh**2-M**2)
+    G = Gammahhh_treelevel_cos(ba, b, M)-(3*mh**2/v)*(-(np.cos(ba)/np.tan(b)+np.sin(ba))**3*3*mt**4/(3*np.pi**2*mh**2*v**2)+mh**4/(2*np.pi**2*mh**2*v**2)+(mH**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mH**2))**3+R47**3*(mA**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mA**2))**3+(mHpm**4/(6*np.pi**2*mh**2*v**2))*(1-M**2/(mHpm**2))**3)
+    #G = Gammahhh_treelevel_cos(ba, b, M)-(3*mh**2/v)*(-3*mt**4/(3*np.pi**2*mh**2*v**2)+(mH**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mH**2))**3+(mA**4/(12*np.pi**2*mh**2*v**2))*(1-M**2/(mA**2))**3+(mHpm**4/(6*np.pi**2*mh**2*v**2))*(1-M**2/(mHpm**2))**3)
+    
+    return G
+
 def find_random_points(N):
     '''Generate N random points in the parameter space. mA, mH, mHpm varying from 125 to 1000, cos(alpha) from -1 to 1, tan(beta) from 1.5 to 5 and M from 1e3 to 1e7.
         Returns: mA, mH, mHpm, cosa, tanb, M.
@@ -86,7 +92,6 @@ def find_random_points(N):
         DataFrame['mHpm'] = mHpm_min+numb[2]*(mHpm_max-mHpm_min)
         DataFrame['tanb'] = tanb_min+numb[4]*(tanb_max-tanb_min)
         DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-(np.pi/2)+np.random.choice([-1,1],size=N)*numb[3]*non_alignment_max)
-        #DataFrame['M'] = 10**(3+numb[5]*(7-3))
         if small_l5:
             DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),v,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
         else:
@@ -101,7 +106,6 @@ def find_random_points(N):
         DataFrame['mHpm'] = mHpm_min+numb[2]*(mHpm_max-mHpm_min)
         DataFrame['tanb'] = tanb_min+numb[4]*(tanb_max-tanb_min)
         DataFrame['cosa'] = np.cos(beta(DataFrame['tanb'])-np.pi/2)
-        #DataFrame['M'] = 10**(3+numb[5]*(7-3))
         if small_l5:
             DataFrame['M'] = np.sqrt(m122(DataFrame['mA'], np.sin(beta(DataFrame['tanb'])), np.cos(beta(DataFrame['tanb'])),v,numb[5]*l5_size_max,0,0)/(np.sin(beta(DataFrame['tanb']))*np.cos(beta(DataFrame['tanb']))))
         else:

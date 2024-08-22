@@ -14,7 +14,7 @@ import datetime
 import scan_parameterspace_funcs as fcs
 
 Spheno_path = '/home/leo/Documents/Unicamp/HEPTools/SPheno/'
-keep_log = False
+keep_log = True
 
 def write_spheno_LHA(par_list):
     '''Input parameters for SPheno for THDM. The parameters are lambda1,lambda2,lambda3,lambda4,lambda5,m12 and tan(beta).'''
