@@ -18,11 +18,13 @@ import quartic_couplings as qtcp
 from scipy import stats
 from time import time
 
-s_mean = 0.00
+s_mean = -0.05
 δs = 0.07
 
-t_mean = 0.05
+t_mean = 0.00
 δt = 0.06
+
+corr = 0.93
 
 N_parameters = 6-1*fcs.alignment
 THDM_type = fcs.THDM_type
@@ -96,16 +98,30 @@ def STU_constraint(s,t,u):
     smin = s_mean-δs
     tmax = t_mean+δt
     tmin = t_mean-δt
-    umax = 0.00
-    umin = -0.00
+    # umax = 0.00
+    # umin = -0.00
     
-    res = np.where((smin<s)
-                   & (s<smax)
-                   & (tmin<t) 
-                   & (t<tmax)
-                   # & (umin<u)
-                   # & (u<umax),
-                   ,False,True)
+    c12 = corr*δs*δt
+    
+    #C = np.array([[δs**2,c12],[c12,δt**2]])
+    #Cinv = np.linalg.inv(C)
+    
+    #χ2 = d.T @ (Cinv @ d)
+    
+    χ2 = (δs**2*(t-t_mean)**2+δt**2*(s-s_mean)**2-2*c12*(t-t_mean)*(s-s_mean))/(δs**2*δt**2-c12**2)
+    
+    # res = np.where((smin<s)
+    #                & (s<smax)
+    #                & (tmin<t) 
+    #                & (t<tmax)
+    #                # & (umin<u)
+    #                # & (u<umax),
+    #                ,False,True)
+    
+    Δχ = χ2-np.min(χ2)
+    CL = stats.chi2.cdf(Δχ, 2)
+    
+    res = np.where(CL<0.95,False,True)
     
     return res
 
@@ -117,9 +133,9 @@ def signals_const(chisq):
     N_d_freedom = N_observables-N_parameters
     
     Δχ = chisq-np.min(chisq)
-    CL = 1-stats.chi2.cdf(Δχ, N_d_freedom)
+    CL = stats.chi2.cdf(Δχ, N_d_freedom)
     
-    return np.where(CL>0.95,False,True)
+    return np.where(CL<0.95,False,True)
 
 def calculate_lambda(DtFrame):
     lamb = []
@@ -306,10 +322,10 @@ def main_module(N_points):
 
     STU = TotalSP.T.loc[['S-parameter (1-loop BSM)','T-parameter (1-loop BSM)','U-parameter (1-loop BSM)','HiggsB','HiggsS']].T
     STU=STU.drop(index=0).set_index(TableTot.index)
-    TableTot_STU = pd.concat([TableTot,STU],axis=1)
+    TableTot = pd.concat([TableTot,STU],axis=1)
 
-    cnd = STU_constraint(TableTot_STU['S-parameter (1-loop BSM)'],TableTot_STU['T-parameter (1-loop BSM)'],TableTot_STU['U-parameter (1-loop BSM)'])
-    TableTot_STU = TableTot_STU.drop(TableTot_STU[cnd].index)
+    cnd = STU_constraint(TableTot['S-parameter (1-loop BSM)'],TableTot['T-parameter (1-loop BSM)'],TableTot['U-parameter (1-loop BSM)'])
+    TableTot_STU = TableTot.drop(TableTot[cnd].index)
 
     cnd = collider_const(TableTot_STU['HiggsB'])
     TableTot_STU_Collid = TableTot_STU.drop(TableTot_STU[cnd].index)
@@ -328,5 +344,22 @@ def main_module(N_points):
     TableTot_STU_Collid_BSG = TableTot_STU_Collid.drop(TableTot_STU_Collid[cnd].index)
     e5 = time()
     print('Duration - BSG bounds: %f' %(e5-s5))
+    
+    #%%                                 Impose perturbative unitarity bounds
+    
+    s6 = time()
+    TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,pd.DataFrame(np.abs(np.array(calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
 
-    return TableTot, TableTot_STU, TableTot_STU_Collid, TableTot_STU_Collid_BSG
+    # for cs in ['c93','c94','c102','c123','c140']:
+    #     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
+    #     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+
+    TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG_unit,pd.DataFrame(np.array(calculate_eigenvalues(TableTot_STU_Collid_BSG_unit)).T,columns=['a0'])],axis=1)
+
+    cnd = perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit['a0'])
+    TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+    e6 = time()
+    
+    print('Duration - PU bounds: %f' %(e6-s6))
+
+    return TableTot, TableTot_STU, TableTot_STU_Collid, TableTot_STU_Collid_BSG, TableTot_STU_Collid_BSG_unit

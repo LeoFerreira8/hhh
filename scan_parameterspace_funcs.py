@@ -7,11 +7,11 @@ Created on Mon Apr 22 11:09:52 2024
 import pandas as pd
 import numpy as np
 
-alignment = True
-small_l5 = False
+alignment = False
+small_l5 = True
 l5_size_max = 1e-8
 non_alignment_max = 0.2
-THDM_type=''
+THDM_type='II'
 MW = 'PDG 2024'
 
 ### ---------      SM param

@@ -36,12 +36,13 @@ print('Generating points for '+spr.latex_model+' in')
 print('alignment' if fcs.alignment else 'non-alignment '+strg)
 print('with small l5' if fcs.small_l5 else 'varying l5')
 
-path_files = [Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Theo.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-BSG.csv')]
+path_files = [Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Theo.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-BSG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-PU.csv')]
 
 for i in range(Number_of_datasets):
     res = spr.main_module(Numer_of_points)
-    header = [not path_files[0].exists(),not path_files[1].exists(),not path_files[2].exists(),not path_files[3].exists()]
+    header = [not path_files[0].exists(),not path_files[1].exists(),not path_files[2].exists(),not path_files[3].exists(),not path_files[4].exists()]
     res[0].to_csv(path_files[0],mode='a',header=header[0],index=False)
     res[1].to_csv(path_files[1],mode='a',header=header[1],index=False)
     res[2].to_csv(path_files[2],mode='a',header=header[2],index=False)
     res[3].to_csv(path_files[3],mode='a',header=header[3],index=False)
+    res[4].to_csv(path_files[4],mode='a',header=header[4],index=False)

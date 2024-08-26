@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Created on Sun May 26 00:13:53 2024
 
@@ -47,10 +46,10 @@ else:
 
 set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'/'
 
-TableTot = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Theo.csv')
-TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU.csv')
-TableTot_STU_Collid = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid.csv')
-TableTot_STU_Collid_BSG = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG.csv')
+TableTot = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Theo_PDG.csv')
+TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU_PDG.csv')
+TableTot_STU_Collid = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
+TableTot_STU_Collid_BSG = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv')
 
 Dataset_teo = {'name': r'T', 'data': TableTot}
 Dataset_stu = {'name': r'T+EW', 'data': TableTot_STU}
