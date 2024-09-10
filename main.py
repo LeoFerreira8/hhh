@@ -150,10 +150,10 @@ mh_array = np.linspace(-50,50,101)+mhSM #Plot mhSM +-50 GeV
 mA = 300 #Pseudoscalar mass
 mHpm = 300 #Charged scalar mass
 mH = 300  #Heavy Higgs mass
-sBmA = 0.9 #Standard definition of sin(β-α) in anyBSM
-M = 600 #Standard definition of M in anyBSM
+sBmA = 1 #Standard definition of sin(β-α) in anyBSM
+M = 300 #Standard definition of M in anyBSM
 BmA = np.arcsin(sBmA)
-Beta = np.arctan(10)
+Beta = np.arctan(1)
 
 ###                         Plot 3 - 2HDM 1-loop comparison as function of M
 
@@ -184,25 +184,26 @@ fig, ax = plt.subplots(figsize=(10, 10))
 
 plt.plot(mh_array, δΓ,label='Without Higgs loop correction')
 plt.plot(mh_array, δΓ2,label='With Higgs loop correction')
-plt.yticks(size=20)
-plt.ylabel(r'$(\kappa_\lambda^{{Kan}}-\kappa_\lambda)/\kappa_\lambda^{{Kan}}$', size=25)
-plt.xticks(size=20)
+plt.yticks(size=25)
+plt.ylabel(r'$(\bar{\kappa}_\lambda-\kappa_\lambda)/\bar{\kappa}_\lambda$', size=25)
+plt.xticks(size=25)
 plt.xlabel(r'SM-Higgs mass $m_h$ [GeV]', size=25)
+plt.minorticks_on()
 ax.grid()
 
 textstr = '\n'.join((
     r'\textbf{2HDM-II}',
-    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
-    r'$M=%d$' %(M),
+    r'$M_A=%d$ GeV' %(mA),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
+    r'$M=%d$ GeV' %(M),
     r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
     r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
-ax.text(0.70, 0.5, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
+ax.text(0.70, 0.5, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
 
-plt.legend(fontsize=20)
+plt.legend(fontsize=25,loc='upper left')
 
 plt.show()
 
@@ -269,39 +270,43 @@ for i,x in enumerate(M_array):
     Γ[i] = np.real(lamb["total"])
     Γ0[i] = np.real(lamb["treelevel"])
 
+#%%
+
 fig, ax = plt.subplots(figsize=(10, 10))
 
-plt.plot(M_array, (Γ/lambdahhhSM),c='k',label='AnyBSM')
+plt.plot(M_array, (Γ/lambdahhhSM),c='k',label='Full calculation')
 #plt.plot(M_array, (Γ0/lambdahhhSM),c='b',label='AnyBSM (tree-level)')
 #plt.plot(M_array, (-Gammahhh_treelevel(np.arcsin(sBmA)-np.pi/2, M_array)/lambdahhhSM),c='y',label='Kanemura (tree-level) (Approx. x)',ls='dashed')
-plt.plot(M_array, (-Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M_array,mH,mA,mHpm)/lambdahhhSM),c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
+#plt.plot(M_array, (-Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M_array,mH,mA,mHpm)/lambdahhhSM),c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
 #plt.plot(M_array, (-Gammahhh_treelevel_cos(BmA,Beta, M_array)/lambdahhhSM),c='y',label='Kanemura (tree-level)',ls='dashdot')
-plt.plot(M_array, (-Gammahhh_oneloop_cos_kan(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='green',label='Kanemura (one-loop)')
-plt.plot(M_array, (-Gammahhh_oneloop_cos(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='orange',ls='dashdot',label='Kanemura (Top) (one-loop)')
-plt.plot(M_array, (-Gammahhh_oneloop_cos_correc(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='red',ls='dashed',label='Kanemura (Top+Higgs). (one-loop)')
-plt.yticks(size=20)
+plt.plot(M_array, (-Gammahhh_oneloop_cos_kan(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='green',label='Leading contribution')
+plt.plot(M_array, (-Gammahhh_oneloop_cos(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='orange',ls='dashdot',label='Leading contribution (+Top)')
+plt.plot(M_array, (-Gammahhh_oneloop_cos_correc(BmA,Beta, M_array,mH,mA,mHpm)/lambdahhhSM),c='red',ls='dashed',label='Leading contribution (+Top+Higgs)')
+plt.yticks(size=25)
 plt.ylabel(r'$\kappa_\lambda$', size=25)
-plt.xticks(size=20)
+plt.xticks(size=25)
 plt.xlabel(r'$M$ [GeV]', size=25)
+plt.minorticks_on()
 #plt.yscale('log')
+#plt.ylim(0.9,1.1)
 
 ax.grid()
 
 textstr = '\n'.join((
     r'\textbf{2HDM-II}',
-    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
+    r'$M_A=%d$ GeV' %(mA),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
 #    r'$M=%d$' %(M),
     r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
     r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
 ax.yaxis.get_offset_text().set_fontsize(20)
-ax.text(0.05, 0.75, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
+ax.text(0.05, 0.69, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
 
 
-#plt.legend(loc='lower left',fontsize=17)
+plt.legend(loc='lower left',fontsize=18)
 
 plt.show()
 
@@ -331,37 +336,67 @@ for i,x in enumerate(sBmA_array):
     lamb = THDM2.lambdahhh()
     Γ[i] = np.real(lamb["total"])
     Γ0[i] = np.real(lamb["treelevel"])
+    
+#%%
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
-plt.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
-plt.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
+plt.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='Full calculation (tree-level)')
+plt.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='Full calculation')
 #plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) Approx',ls='dashed')
 #plt.plot(sBmA_array, -Gammahhh_oneloop(np.arcsin(sBmA_array)-np.pi/2, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) Approx',ls='dashed')
-plt.plot(sBmA_array, -Gammahhh_treelevel_cos(np.arcsin(sBmA_array),Beta, M)/lambdahhhSM,c='y',label='Kanemura (tree-level)',ls='dashdot')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos_kan(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='green',ls='dashed',label='Kanemura (one-loop)')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (Top) (one-loop)')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos_correc(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Kanemura (Top+Higgs). (one-loop)')
-plt.yticks(size=20)
+plt.plot(sBmA_array, -Gammahhh_treelevel_cos(np.arcsin(sBmA_array),Beta, M)/lambdahhhSM,c='y',label='Leading contribution (tree-level)',ls='dashdot')
+plt.plot(sBmA_array, -Gammahhh_oneloop_cos_kan(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='green',ls='dashed',label='Leading contribution')
+plt.plot(sBmA_array, -Gammahhh_oneloop_cos(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Leading contribution (+Top)')
+plt.plot(sBmA_array, -Gammahhh_oneloop_cos_correc(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Leading contribution (+Top+Higgs)')
+plt.yticks(size=25)
 plt.ylabel(r'$\kappa_\lambda$', size=25)
-plt.xticks(size=20)
+plt.xticks(size=25)
 plt.xlabel(r'$s_{\beta-\alpha}$', size=25)
 ax.grid()
+plt.minorticks_on()
 
 textstr = '\n'.join((
     r'\textbf{2HDM-II}',
-    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
-    r'$M=%d$' %(M),
+    r'$M_A=%d$ GeV' %(mA),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
+    r'$M=%d$ GeV' %(M),
 #    r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
     r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
 ax.yaxis.get_offset_text().set_fontsize(20)
-ax.text(0.05, 0.35, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
+ax.text(0.05, 0.25, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
 
-plt.legend(fontsize=20)
+# Make the zoom-in plot:
+    
+x1 = 0.99
+x2 = 1.00
+
+# select y-range for zoomed region
+y1 = 0.85
+y2 = 1.005
+
+axins = zoomed_inset_axes(ax, 28, loc='lower right', bbox_to_anchor=(0.67, 0.18, 0.5, 0.5), bbox_transform=ax.figure.transFigure,axes_kwargs={'aspect': .08}) # zoom = 10
+axins.plot(sBmA_array, Γ0/lambdahhhSM,c='b')
+axins.plot(sBmA_array, Γ/lambdahhhSM,c='k')
+#plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) Approx',ls='dashed')
+#plt.plot(sBmA_array, -Gammahhh_oneloop(np.arcsin(sBmA_array)-np.pi/2, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) Approx',ls='dashed')
+axins.plot(sBmA_array, -Gammahhh_treelevel_cos(np.arcsin(sBmA_array),Beta, M)/lambdahhhSM,c='y',ls='dashdot')
+axins.plot(sBmA_array, -Gammahhh_oneloop_cos_kan(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='green',ls='dashed')
+axins.plot(sBmA_array, -Gammahhh_oneloop_cos(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='orange')
+axins.plot(sBmA_array, -Gammahhh_oneloop_cos_correc(np.arcsin(sBmA_array),Beta, M,mH,mA,mHpm)/lambdahhhSM,c='red',ls='dashed')
+axins.set_xlim(x1, x2)
+axins.set_ylim(y1, y2)
+plt.xticks(visible=True,fontsize=20)
+plt.yticks(visible=True,fontsize=20)
+axins.grid()
+mark_inset(ax, axins,loc1=2,loc2=1, fc="none", ec="0.65",clip_on=True)
+plt.draw()
+axins.minorticks_on()
+
+ax.legend(fontsize=18,framealpha=1,loc='upper center')
 
 plt.show()
 
@@ -401,52 +436,61 @@ a0=[THDM2.eigSSSS(parameters={'TanBeta':x}) for x in sBmA_array]
 
 for i,x in enumerate(sBmA_array):
     THDM2.setparameters({'TanBeta': x})
-    if (a0[i]>0.5):
-        Γ[i] = np.nan
-        Γ0[i] = np.nan
-    else:
-        lamb = THDM2.lambdahhh()
-        Γ[i] = np.real(lamb["total"])
-        Γ0[i] = np.real(lamb["treelevel"])
+    # if (a0[i]>0.5):
+    #     Γ[i] = np.nan
+    #     Γ0[i] = np.nan
+    # else:
+    #     lamb = THDM2.lambdahhh()
+    #     Γ[i] = np.real(lamb["total"])
+    #     Γ0[i] = np.real(lamb["treelevel"])
+    lamb = THDM2.lambdahhh()
+    Γ[i] = np.real(lamb["total"])
+    Γ0[i] = np.real(lamb["treelevel"])
 
 #%%
 
+y1=-Gammahhh_treelevel_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M)/lambdahhhSM
+y2=-Gammahhh_oneloop_cos_kan(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM
+y3=-Gammahhh_oneloop_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM
+y4=-Gammahhh_oneloop_cos_correc(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM
+
+y1,y2,y3,y4=[np.where(np.array(a0)<0.5,y,np.nan) for y in [y1,y2,y3,y4]]
+
 fig, ax = plt.subplots(figsize=(10, 10))
 
-plt.vlines(sBmA_array[np.where(np.isnan(Γ))[0][0]-1],0.35,2.5,colors='k',alpha=0.2)
-plt.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
-plt.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
-#plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) Approx',ls='dashed')
-#plt.plot(sBmA_array, -Gammahhh_oneloop(np.arcsin(sBmA_array)-np.pi/2, M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) Approx',ls='dashed')
-plt.plot(sBmA_array, -Gammahhh_treelevel_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M)/lambdahhhSM,c='y',label='Kanemura (tree-level)',ls='dashdot')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos_kan(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM,c='green',ls='dashed',label='Kanemura (one-loop)')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM,c='orange',label='Kanemura (Top) (one-loop)')
-plt.plot(sBmA_array, -Gammahhh_oneloop_cos_correc(np.arcsin(sBmA),np.arctan(sBmA_array), M,mH,mA,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Kanemura (Top+Higgs). (one-loop)')
-plt.yticks(size=20)
+# plt.vlines(sBmA_array[np.where(np.isnan(Γ))[0][0]-1],0.35,2.5,colors='k',alpha=0.2)
+# plt.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='Full calculation (tree-level)')
+plt.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='Full calculation')
+# plt.plot(sBmA_array, y1,c='y',label='Leading contribution (tree-level)',ls='dashdot')
+# plt.plot(sBmA_array, y2,c='green',ls='dashed',label='Leading contribution')
+# plt.plot(sBmA_array, y3,c='orange',label='Leading contribution (+Top)')
+# plt.plot(sBmA_array, y4,c='red',ls='dashed',label='Leading contribution (+Top+Higgs)')
+plt.yticks(size=25)
 plt.ylabel(r'$\kappa_\lambda$', size=25)
-plt.xticks(size=20)
+plt.xticks(size=25)
 plt.xlabel(r'$\tan{\beta}$', size=25)
 ax.grid()
 
 textstr = '\n'.join((
     r'\textbf{2HDM-II}',
-    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
-    r'$M=%d$' %(M),
+    r'$M_A=%d$ GeV' %(mA),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
+    r'$M=%d$ GeV' %(M),
     r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
 #    r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
 ax.yaxis.get_offset_text().set_fontsize(20)
-ax.text(0.02, 0.8, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
-ax.text(0.72, 0.9, 'Perturbative unitarity'+'\n'+'constraint', transform=ax.transAxes, fontsize=18, verticalalignment='top',horizontalalignment='center',alpha=0.8)
+ax.text(0.05, 0.91, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
+ax.text(0.72, 0.55, r'\textbf{Perturbative unitarity}'+'\n'+r'\textbf{constraint}', transform=ax.transAxes, fontsize=18, verticalalignment='top',horizontalalignment='center',alpha=0.8)
 
-plt.ylim(0.35,2.5)
+plt.ylim(0.35,100)
 plt.xlim(0,40)
 ax.fill_between(sBmA_array[np.where(np.isnan(Γ))[0][0]-1:],0.35,2.5,hatch="/",color='k',alpha=0.2)
+plt.minorticks_on()
 
-plt.legend(fontsize=16,loc='lower right',framealpha=0.99)
+plt.legend(fontsize=18,loc='lower right',framealpha=0.99)
 
 # Make the zoom-in plot:
     
@@ -457,7 +501,7 @@ x2 = 5
 y1 = 0.35
 y2 = 0.7
 
-axins = zoomed_inset_axes(ax, 2, loc='center right') # zoom = 2
+axins = zoomed_inset_axes(ax, 2, loc='upper right', bbox_to_anchor=(0.35, 0.38, 0.5, 0.5), bbox_transform=ax.figure.transFigure) # zoom = 2
 axins.plot(sBmA_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
 axins.plot(sBmA_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
 #plt.plot(sBmA_array, -Gammahhh_treelevel(np.arcsin(sBmA_array)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) Approx',ls='dashed')
@@ -471,7 +515,7 @@ axins.set_ylim(y1, y2)
 plt.xticks(visible=True,fontsize=20)
 plt.yticks(visible=True,fontsize=20)
 axins.grid()
-mark_inset(ax, axins, loc1=2, loc2=4, fc="none", ec="0.5")
+mark_inset(ax, axins, loc1=3, loc2=2, fc="none", ec="0.7")
 plt.draw()
 
 plt.show()
@@ -608,10 +652,10 @@ plt.show()
 mA = 300 #Pseudoscalar mass
 mHpm = 300 #Charged scalar mass
 mH = 300  #Heavy Higgs mass
-sBmA = 0.9 #Standard definition of sin(β-α) in anyBSM
-M = 800 #Standard definition of M in anyBSM
+sBmA = 1 #Standard definition of sin(β-α) in anyBSM
+M = 300 #Standard definition of M in anyBSM
 BmA = np.arcsin(sBmA)
-Beta = np.arctan(10)
+Beta = np.arctan(1)
 
 ###                         Plot 3 - 2HDM 1-loop comparison as function of M_A
 
@@ -632,40 +676,46 @@ for i,x in enumerate(M_array):
     lamb = THDM2.lambdahhh()
     Γ[i] = np.real(lamb["total"])
     Γ0[i] = np.real(lamb["treelevel"])
+    
+#%%
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
-plt.plot(M_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
+plt.plot(M_array, Γ/lambdahhhSM,c='k',label='Full calculation')
+#plt.plot(M_array,-Gammahhh_treelevel_cos(BmA, Beta, M)/lambdahhhSM+(M_array**4/(12*np.pi**2*mh**2*v**2)))#-3*M**2*M_array**2/(12*np.pi**2*mh**2*v**2))#*(1-M**2/(M_array**2))**3)
 #plt.plot(M_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
 #plt.plot(M_array, -Gammahhh_treelevel(np.arcsin(sBmA)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) (Approx. x)',ls='dashed')
-plt.plot(M_array, -Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M,mH,M_array,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
+#plt.plot(M_array, -Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M,mH,M_array,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
 #plt.plot(M_array, -Gammahhh_treelevel_cos(BmA,Beta, M)/lambdahhhSM,c='y',label='Kanemura (tree-level)',ls='dashdot')
-plt.plot(M_array, -Gammahhh_oneloop_cos_kan(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='green',label='Kanemura (one-loop)')
-plt.plot(M_array, -Gammahhh_oneloop_cos(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='orange',ls='dashdot',label='Kanemura (Top) (one-loop)')
-plt.plot(M_array, -Gammahhh_oneloop_cos_correc(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Kanemura (Top+Higgs). (one-loop)')
-plt.yticks(size=20)
+plt.plot(M_array, -Gammahhh_oneloop_cos_kan(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='green',label='Leading contribution')
+plt.plot(M_array, -Gammahhh_oneloop_cos(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='orange',ls='dashdot',label='Leading contribution (+Top)')
+plt.plot(M_array, -Gammahhh_oneloop_cos_correc(BmA,Beta, M,mH,M_array,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Leading contribution (+Top+Higgs)')
+plt.yticks(size=25)
+#plt.yscale('log')
+#plt.xscale('log')
 plt.ylabel(r'$\kappa_\lambda$', size=25)
-plt.xticks(size=20)
+plt.xticks(size=25)
 plt.xlabel(r'$M_A$ [GeV]', size=25)
 ax.grid()
+plt.minorticks_on()
 
 #plt.ylim(-10,10)
 
 textstr = '\n'.join((
     r'\textbf{2HDM-II}',
 #    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
-    r'$M=%d$' %(M),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
+    r'$M=%d$ GeV' %(M),
     r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
     r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
 ax.yaxis.get_offset_text().set_fontsize(20)
-ax.text(0.05, 0.85, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
+ax.text(0.05, 0.92, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
 
 
-plt.legend(fontsize=20)
+plt.legend(fontsize=18,loc='center left')
 
 plt.show()
 
@@ -675,7 +725,7 @@ plt.show()
 mA = 300 #Pseudoscalar mass
 mHpm = 300 #Charged scalar mass
 mH = 300  #Heavy Higgs mass
-sBmA = 0.9 #Standard definition of sin(β-α) in anyBSM
+sBmA = 1 #Standard definition of sin(β-α) in anyBSM
 M = 300 #Standard definition of M in anyBSM
 BmA = np.arcsin(sBmA)
 Beta = np.arctan(1)
@@ -699,40 +749,43 @@ for i,x in enumerate(M_array):
     lamb = THDM2.lambdahhh()
     Γ[i] = np.real(lamb["total"])
     Γ0[i] = np.real(lamb["treelevel"])
+    
+#%%
 
 fig, ax = plt.subplots(figsize=(10, 10))
 
-plt.plot(M_array, Γ/lambdahhhSM,c='k',label='AnyBSM')
+plt.plot(M_array, Γ/lambdahhhSM,c='k',label='Full calculation')
 #plt.plot(M_array, Γ0/lambdahhhSM,c='b',label='AnyBSM (tree-level)')
 #plt.plot(M_array, -Gammahhh_treelevel(np.arcsin(sBmA)-np.pi/2, M)/lambdahhhSM,c='y',label='Kanemura (tree-level) (Approx. x)',ls='dashed')
-plt.plot(M_array, -Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M_array,mH,M_array,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
+#plt.plot(M_array, -Gammahhh_oneloop(np.arcsin(sBmA)-np.pi/2, M_array,mH,M_array,mHpm)/lambdahhhSM,c='orange',label='Kanemura (one-loop) (Approx. x)',ls='dashed')
 #plt.plot(M_array, -Gammahhh_treelevel_cos(BmA,Beta, M)/lambdahhhSM,c='y',label='Kanemura (tree-level)',ls='dashdot')
-plt.plot(M_array, -Gammahhh_oneloop_cos_kan(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='green',label='Kanemura (one-loop)')
-plt.plot(M_array, -Gammahhh_oneloop_cos(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='orange',ls='dashdot',label='Kanemura (Top) (one-loop)')
-plt.plot(M_array, -Gammahhh_oneloop_cos_correc(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Kanemura (Top+Higgs). (one-loop)')
-plt.yticks(size=20)
+plt.plot(M_array, -Gammahhh_oneloop_cos_kan(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='green',label='Leading contribution')
+plt.plot(M_array, -Gammahhh_oneloop_cos(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='orange',ls='dashdot',label='Leading contribution (+Top)')
+plt.plot(M_array, -Gammahhh_oneloop_cos_correc(BmA,Beta, M_array,mH,M_array,mHpm)/lambdahhhSM,c='red',ls='dashed',label='Leading contribution (+Top+Higgs)')
+plt.yticks(size=25)
 plt.ylabel(r'$\kappa_\lambda$', size=25)
-plt.xticks(size=20)
+plt.xticks(size=25)
 plt.xlabel(r'$M_A$ [GeV]', size=25)
 ax.grid()
+plt.minorticks_on()
 
 #plt.ylim(-10,10)
 
 textstr = '\n'.join((
     r'\textbf{2HDM-331 EFT}',
 #    r'$M_A=%d$' %(mA),
-    r'$M_{H}=%d$' %(mH),
-    r'$M_{H^\pm}=%d$' %(mHpm),
+    r'$M_{H}=%d$ GeV' %(mH),
+    r'$M_{H^\pm}=%d$ GeV' %(mHpm),
 #    r'$M=%d$' %(M),
     r'$\sin(\beta-\alpha)=%.2f$' %(sBmA),
     r'$\tan(\beta)=%.1f$' %(np.tan(Beta)),
     ))
 
 ax.yaxis.get_offset_text().set_fontsize(20)
-ax.text(0.05, 0.55, textstr, transform=ax.transAxes, fontsize=18, verticalalignment='top')
+ax.text(0.05, 0.6, textstr, transform=ax.transAxes, fontsize=20, verticalalignment='top')
 
 
-plt.legend(fontsize=20)
+#plt.legend(fontsize=18)
 
 plt.show()
 

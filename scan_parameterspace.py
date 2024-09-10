@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Mon Apr 22 11:09:52 2024
 
@@ -94,12 +92,6 @@ def STU_constraint(s,t,u):
     ΔS = -0.01+-0.07 
     ΔT = 0.04+-0.06 
     '''
-    smax = s_mean+δs
-    smin = s_mean-δs
-    tmax = t_mean+δt
-    tmin = t_mean-δt
-    # umax = 0.00
-    # umin = -0.00
     
     c12 = corr*δs*δt
     
@@ -109,14 +101,6 @@ def STU_constraint(s,t,u):
     #χ2 = d.T @ (Cinv @ d)
     
     χ2 = (δs**2*(t-t_mean)**2+δt**2*(s-s_mean)**2-2*c12*(t-t_mean)*(s-s_mean))/(δs**2*δt**2-c12**2)
-    
-    # res = np.where((smin<s)
-    #                & (s<smax)
-    #                & (tmin<t) 
-    #                & (t<tmax)
-    #                # & (umin<u)
-    #                # & (u<umax),
-    #                ,False,True)
     
     Δχ = χ2-np.min(χ2)
     CL = stats.chi2.cdf(Δχ, 2)
@@ -133,7 +117,7 @@ def signals_const(chisq):
     N_d_freedom = N_observables-N_parameters
     
     Δχ = chisq-np.min(chisq)
-    CL = stats.chi2.cdf(Δχ, N_d_freedom)
+    CL = stats.chi2.cdf(np.array(Δχ), N_d_freedom)
     
     return np.where(CL<0.95,False,True)
 
@@ -194,7 +178,7 @@ def calculate_eigenvalues(DtFrame):
             THDM2.load_renormalization_scheme('OSalignment')
             
         a0.append(THDM2.eigSSSS(parameters={'Mh2': DtFrame.at[i,'mH'], 'MAh2': DtFrame.at[i,'mA'], 'MHm2': DtFrame.at[i,'mHpm'], 'TanBeta': DtFrame.at[i,'tanb'], 'SinBmA': sino[i],'M': DtFrame.at[i,'M'], 'MWm': fcs.MW, 'MWp': fcs.MW}))
-    
+
     return a0
 
 def perturbative_unitarity_const_a0(a0):
@@ -321,6 +305,10 @@ def main_module(N_points):
     #%%                                 Impose bounds from STU and Collider
 
     STU = TotalSP.T.loc[['S-parameter (1-loop BSM)','T-parameter (1-loop BSM)','U-parameter (1-loop BSM)','HiggsB','HiggsS']].T
+    STU['S-parameter (1-loop BSM)']=pd.to_numeric(STU['S-parameter (1-loop BSM)'],errors='coerce')
+    STU['T-parameter (1-loop BSM)']=pd.to_numeric(STU['T-parameter (1-loop BSM)'],errors='coerce')
+    STU['U-parameter (1-loop BSM)']=pd.to_numeric(STU['U-parameter (1-loop BSM)'],errors='coerce')
+    STU['HiggsS']=pd.to_numeric(STU['HiggsS'],errors='coerce')
     STU=STU.drop(index=0).set_index(TableTot.index)
     TableTot = pd.concat([TableTot,STU],axis=1)
 
@@ -348,7 +336,10 @@ def main_module(N_points):
     #%%                                 Impose perturbative unitarity bounds
     
     s6 = time()
-    TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,pd.DataFrame(np.abs(np.array(calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
+    aux = pd.DataFrame(np.abs(np.array(calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])
+    #aux=aux.drop(index=0).set_index(TableTot_STU_Collid_BSG.index)
+    TableTot_STU_Collid_BSG=TableTot_STU_Collid_BSG.reset_index(drop=True)
+    TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,aux],axis=1)
 
     # for cs in ['c93','c94','c102','c123','c140']:
     #     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])

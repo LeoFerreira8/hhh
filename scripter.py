@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 scripter file
 Created on Thu Jul 18 17:38:17 2024
@@ -15,7 +13,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-Number_of_datasets = 4
+Number_of_datasets = 2
 Numer_of_points = 3e7
 
 if fcs.alignment:
@@ -36,7 +34,7 @@ print('Generating points for '+spr.latex_model+' in')
 print('alignment' if fcs.alignment else 'non-alignment '+strg)
 print('with small l5' if fcs.small_l5 else 'varying l5')
 
-path_files = [Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Theo.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-BSG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-PU.csv')]
+path_files = [Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Theo_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-PU_PDG.csv')]
 
 for i in range(Number_of_datasets):
     res = spr.main_module(Numer_of_points)

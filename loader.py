@@ -50,11 +50,13 @@ TableTot = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Theo_PD
 TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU_PDG.csv')
 TableTot_STU_Collid = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
 TableTot_STU_Collid_BSG = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv')
+TableTot_STU_Collid_BSG_unit = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG.csv')
 
 Dataset_teo = {'name': r'T', 'data': TableTot}
 Dataset_stu = {'name': r'T+EW', 'data': TableTot_STU}
 Dataset_col = {'name': r'T+EW+C', 'data': TableTot_STU_Collid}
 Dataset_bsg = {'name': r'T+EW+C+bs$\gamma$', 'data': TableTot_STU_Collid_BSG}
+Dataset_unit = {'name': r'T+EW+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit}
 
 ####### loading CDF data
 
@@ -66,11 +68,13 @@ if load_CDF:
     TableTot_STU_CDF = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU.csv')
     TableTot_STU_Collid_CDF = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid.csv')
     TableTot_STU_Collid_BSG_CDF = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG.csv')
+    TableTot_STU_Collid_BSG_unit_CDF = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU.csv')
     
     Dataset_teo_cdf = {'name': r'T', 'data': TableTot_CDF}
     Dataset_stu_cdf = {'name': r'T+EW (CDF)', 'data': TableTot_STU_CDF}
     Dataset_col_cdf = {'name': r'T+EW (CDF)+C', 'data': TableTot_STU_Collid_CDF}
     Dataset_bsg_cdf = {'name': r'T+EW (CDF)+C+bs$\gamma$', 'data': TableTot_STU_Collid_BSG_CDF}
+    Dataset_unit_cdf = {'name': r'T+EW (CDF)+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit_CDF}
     
     set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'_Comb_'+'/'
     
@@ -78,11 +82,13 @@ if load_CDF:
     TableTot_STU_Comb = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU.csv')
     TableTot_STU_Collid_Comb = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid.csv')
     TableTot_STU_Collid_BSG_Comb = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG.csv')
+    TableTot_STU_Collid_BSG_unit_Comb = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU.csv')
     
     Dataset_teo_comb = {'name': r'T', 'data': TableTot_Comb}
     Dataset_stu_comb = {'name': r'T+EW (Comb)', 'data': TableTot_STU_Comb}
     Dataset_col_comb = {'name': r'T+EW (Comb)+C', 'data': TableTot_STU_Collid_Comb}
     Dataset_bsg_comb = {'name': r'T+EW (Comb)+C+bs$\gamma$', 'data': TableTot_STU_Collid_BSG_Comb}
+    Dataset_unit_comb = {'name': r'T+EW (Comb)+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit_Comb}
 
 #%%                                 Plots
 
@@ -91,7 +97,7 @@ plt.rc('xtick',labelsize=40)
 plt.rc('ytick',labelsize=40)
 
 def str_to_tex(strg):
-    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\kappa_\lambda^{\text{Kan. Aprox}}$',r'$\kappa_\lambda^{\text{Kan}}$',r'$\sin{(\beta-\alpha)}$',r'$C_{93}$',r'$C_{94}$',r'$C_{102}$',r'$C_{123}$',r'$C_{140}$']
+    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\tilde{\kappa}_\lambda$',r'$\bar{\kappa}_\lambda$',r'$\sin{(\beta-\alpha)}$',r'$C_{93}$',r'$C_{94}$',r'$C_{102}$',r'$C_{123}$',r'$C_{140}$']
     
     if strg=='mA':
         return latex_parameters[0]
@@ -267,13 +273,15 @@ def plotter_diff_color(param1,param2,param3,param4,param5,*dataset):
     cbar=plt.colorbar(label=str_to_tex(param5))
     plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2), size=25)
     plt.xticks(size=20)
-    plt.xlim(-450,200)
+    #plt.xlim(-450,200)
     plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4), size=25)
     plt.yticks(size=20)
-    plt.ylim(-320,350)
+    #plt.ylim(-320,350)
     ax.grid()
     cbar.ax.tick_params(labelsize=20)  # Change size of tick labels
     cbar.ax.yaxis.label.set_size(20)   # Change size of colorbar label
+    
+    plt.savefig('../temp/Colormap_'+param5+THDM_type+strgl5+'-'+strga+'.png', dpi=600)
     
     plt.show()
 
@@ -308,70 +316,76 @@ def plotter_diff_comp(param1,param2,param3,param4,param5,param6,*dataset):
 
 #%%%  Examples
 
-plotter_diff_color('mH','mHpm','mA','mHpm','kappa',Dataset_bsg)
-plotter_diff_color('mH','mHpm','mA','mHpm','tanb',Dataset_bsg)
-plotter_diff('mH','mHpm','mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter_diff_comp('mH','mHpm','mA','mHpm','kappa','kappa-kan',Dataset_bsg)
-plotter('mH','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mHpm','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mHpm','M',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter_3('mHpm','M','kappa',Dataset_bsg)
-plotter('M','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('M','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('tanb','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mA','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mH','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('mHpm','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('l1','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('l2','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('l3','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
-plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter_diff_color('mH','mHpm','mA','mHpm','kappa',Dataset_bsg)
+# plotter_diff_color('mH','mHpm','mA','mHpm','tanb',Dataset_bsg)
+# plotter_diff('mH','mHpm','mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter_diff_comp('mH','mHpm','mA','mHpm','kappa','kappa-kan',Dataset_bsg)
+# plotter('mH','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mHpm','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mHpm','M',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter_3('mHpm','M','kappa',Dataset_bsg)
+# plotter('M','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('M','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('tanb','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mA','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mH','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('mHpm','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('l1','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('l2','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('l3','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
+# plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
 
 #%%%    
 
-TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
+#TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
 
 # for cs in ['c93','c94','c102','c123','c140']:
 #     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
 #     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
 
-TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG_unit,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit)).T,columns=['a0'])],axis=1)
+#TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG_unit,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit)).T,columns=['a0'])],axis=1)
 
-cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit['a0'])
-TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+#cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit['a0'])
+#TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
     
 
 #%%
 
-Dataset_unit = {'name': 'T+EW+C+bsg+PU', 'data': TableTot_STU_Collid_BSG_unit}
+# plotter_diff_color('mH','mHpm','mA','mHpm','kappa',Dataset_unit)
+# plotter_diff_color('mH','mHpm','mA','mHpm','tanb',Dataset_unit)
+# plotter_diff('mH','mHpm','mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter_diff_comp('mH','mHpm','mA','mHpm','kappa','kappa-kan',Dataset_unit)
+# plotter('mH','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mHpm','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mHpm','M',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('M','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('M','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('tanb','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mA','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mH','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('mHpm','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('l1','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('l2','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('l3','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
+# plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
 
-plotter_diff_color('mH','mHpm','mA','mHpm','kappa',Dataset_unit)
-plotter_diff_color('mH','mHpm','mA','mHpm','tanb',Dataset_unit)
-plotter_diff('mH','mHpm','mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter_diff_comp('mH','mHpm','mA','mHpm','kappa','kappa-kan',Dataset_unit)
-plotter('mH','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mHpm','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mHpm','M',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('M','tanb',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('M','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('tanb','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mA','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mH','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('mHpm','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('l1','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('l2','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('l3','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
 #%%%
-plotter('c93','kappa',Dataset_unit)
-plotter('c94','kappa',Dataset_unit)
-plotter('c102','kappa',Dataset_unit)
-plotter('c123','kappa',Dataset_unit)
-plotter('c140','kappa',Dataset_unit)
+# plotter('c93','kappa',Dataset_unit)
+# plotter('c94','kappa',Dataset_unit)
+# plotter('c102','kappa',Dataset_unit)
+# plotter('c123','kappa',Dataset_unit)
+# plotter('c140','kappa',Dataset_unit)
+
+#%%
+
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_unit)
+plotter_diff_color('mHpm','M','mA','M','kappa',Dataset_unit)
+plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit)
+plotter_diff_color('mHpm','M','mA','M','tanb',Dataset_unit)
 
 #%%
 
@@ -379,3 +393,31 @@ if load_CDF:
 
     plotter_diff('mH','mHpm','mA','mHpm',Dataset_stu,Dataset_stu_comb,Dataset_stu_cdf)
     plotter_diff('mH','mHpm','mA','mHpm',Dataset_stu_cdf)
+    
+#%%                 Recalculating CDF and Comb PU
+
+# TableTot_STU_Collid_BSG_unit_CDF= pd.concat([TableTot_STU_Collid_BSG_CDF,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG_CDF))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
+
+# for cs in ['c93','c94','c102','c123','c140']:
+#     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
+#     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+
+# TableTot_STU_Collid_BSG_unit_CDF = pd.concat([TableTot_STU_Collid_BSG_unit_CDF,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit_CDF)).T,columns=['a0'])],axis=1)
+
+# cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit_CDF['a0'])
+# TableTot_STU_Collid_BSG_unit_CDF = TableTot_STU_Collid_BSG_unit_CDF.drop(TableTot_STU_Collid_BSG_unit_CDF[cnd].index)
+
+#%%
+
+# TableTot_STU_Collid_BSG_unit_Comb= pd.concat([TableTot_STU_Collid_BSG_Comb,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG_Comb))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
+
+# for cs in ['c93','c94','c102','c123','c140']:
+#     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
+#     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+
+# TableTot_STU_Collid_BSG_unit_Comb = pd.concat([TableTot_STU_Collid_BSG_unit_Comb,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit_Comb)).T,columns=['a0'])],axis=1)
+
+# cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit_Comb['a0'])
+# TableTot_STU_Collid_BSG_unit_Comb = TableTot_STU_Collid_BSG_unit_Comb.drop(TableTot_STU_Collid_BSG_unit_Comb[cnd].index)
+
+    
