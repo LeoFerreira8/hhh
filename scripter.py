@@ -12,6 +12,7 @@ import scan_parameterspace as spr
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from time import time
 
 Number_of_datasets = 2
 Numer_of_points = 3e7
@@ -36,6 +37,7 @@ print('with small l5' if fcs.small_l5 else 'varying l5')
 
 path_files = [Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Theo_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv'),Path('./'+set_dir.parts[0]+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-PU_PDG.csv')]
 
+strt = time()
 for i in range(Number_of_datasets):
     res = spr.main_module(Numer_of_points)
     header = [not path_files[0].exists(),not path_files[1].exists(),not path_files[2].exists(),not path_files[3].exists(),not path_files[4].exists()]
@@ -44,3 +46,6 @@ for i in range(Number_of_datasets):
     res[2].to_csv(path_files[2],mode='a',header=header[2],index=False)
     res[3].to_csv(path_files[3],mode='a',header=header[3],index=False)
     res[4].to_csv(path_files[4],mode='a',header=header[4],index=False)
+
+end = time()
+print("Total time: %.2f days" %((end-strt)/(3600*24)))

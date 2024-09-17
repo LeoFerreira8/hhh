@@ -8,10 +8,10 @@ import pandas as pd
 import numpy as np
 
 alignment = False
-small_l5 = False
+small_l5 = True
 l5_size_max = 1e-8
 non_alignment_max = 0.2
-THDM_type=''
+THDM_type='II'
 MW = 'PDG 2024'
 
 ### ---------      SM param
