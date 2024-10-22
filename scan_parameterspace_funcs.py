@@ -30,23 +30,31 @@ mh = mhSM
 ### ----------
 
 ### ----------      intervals
-mA_min = 125
-mA_max = 1500
+#mA_min = 125
+#mA_max = 1500
+mA_min = 600
+mA_max = 900
 
-mH_min = 125
-mH_max = 1500
+#mH_min = 125
+#mH_max = 1500
+mH_min = 800
+mH_max = 1200
 
-mHpm_min = 125
-mHpm_max = 1500
+#mHpm_min = 125
+#mHpm_max = 1500
+mHpm_min = 800
+mHpm_max = 1200
 
 cosa_min = -1
 cosa_max = 1
 
 tanb_min = 0.8
-tanb_max = 40
+#tanb_max = 40
+tanb_max = 15
 
 M_min = 1e2
-M_max = 5e3
+# M_max = 5e3
+M_max = 350
 ### ----------
 
 def Gammahhh_treelevel(x,M):

@@ -15,6 +15,7 @@ import bsg
 import quartic_couplings as qtcp
 from scipy import stats
 from time import time
+from pathlib import Path
 
 s_mean = -0.05
 δs = 0.07
@@ -93,6 +94,17 @@ def STU_constraint(s,t,u):
     ΔT = 0.04+-0.06 
     '''
     
+    if fcs.alignment:
+        strga = 'A'
+    else:
+        strg = str(fcs.non_alignment_max)
+        strga = 'NA'+strg
+        
+    if fcs.small_l5:
+        strgl5 = '331lk'
+    else:
+        strgl5 = ''
+    
     c12 = corr*δs*δt
     
     #C = np.array([[δs**2,c12],[c12,δt**2]])
@@ -102,7 +114,20 @@ def STU_constraint(s,t,u):
     
     χ2 = (δs**2*(t-t_mean)**2+δt**2*(s-s_mean)**2-2*c12*(t-t_mean)*(s-s_mean))/(δs**2*δt**2-c12**2)
     
-    Δχ = χ2-np.min(χ2)
+    set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'/'
+    path_file_old = Path('./'+set_dir+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-STU_PDG.csv')
+    
+    if path_file_old.exists():
+        TableTot_STU_old = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU_PDG.csv')
+    
+        s_old, t_old = TableTot_STU_old['S-parameter (1-loop BSM)'],TableTot_STU_old['T-parameter (1-loop BSM)']
+        χ2old = (δs**2*(t_old-t_mean)**2+δt**2*(s_old-s_mean)**2-2*c12*(t_old-t_mean)*(s_old-s_mean))/(δs**2*δt**2-c12**2)
+        
+        χ2min = np.min([np.min(χ2),np.min(χ2old)])
+    else:
+        χ2min = np.min(χ2)
+    
+    Δχ = χ2-χ2min
     CL = stats.chi2.cdf(Δχ, 2)
     
     res = np.where(CL<0.95,False,True)
@@ -116,7 +141,30 @@ def signals_const(chisq):
     N_observables = hggfcs.signals.observableCount()
     N_d_freedom = N_observables-N_parameters
     
-    Δχ = chisq-np.min(chisq)
+    if fcs.alignment:
+        strga = 'A'
+    else:
+        strg = str(fcs.non_alignment_max)
+        strga = 'NA'+strg
+        
+    if fcs.small_l5:
+        strgl5 = '331lk'
+    else:
+        strgl5 = ''
+    
+    set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'/'
+    path_file_old = Path('./'+set_dir+'/THDM'+fcs.THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
+    
+    if path_file_old.exists():
+        TableTot_STU_Collid_old = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
+    
+        χ2old = TableTot_STU_Collid_old['HiggsS']
+        
+        χ2min = np.min([np.min(chisq),np.min(χ2old)])
+    else:
+        χ2min = np.min(chisq)
+    
+    Δχ = chisq-χ2min
     CL = stats.chi2.cdf(np.array(Δχ), N_d_freedom)
     
     return np.where(CL<0.95,False,True)

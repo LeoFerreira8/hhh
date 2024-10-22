@@ -6,18 +6,24 @@ Created on Sun May 26 00:13:53 2024
 
 import numpy as np
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 import scan_parameterspace_funcs as fcs
 import scan_parameterspace as spr
 import quartic_couplings as qtcp
 import bsg
+import seaborn as sns
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 
 #%%%                                Model parameters to load
 THDM_type = 'II'
 small_l5 = True
 alignment = False
 non_alignment_max = 0.2
-load_CDF = True
+load_CDF = False
+Calculate_Teo = False
+Load_Teo = False
 
 ######## loading
 
@@ -52,12 +58,14 @@ TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU
 TableTot_STU_Collid = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
 TableTot_STU_Collid_BSG = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv')
 TableTot_STU_Collid_BSG_unit = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG.csv')
+#TableTot_STU_Collid_BSG_unit_two = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG_kappa.csv')
 
 Dataset_teo = {'name': r'PS', 'data': TableTot}
 Dataset_stu = {'name': r'PS+EW', 'data': TableTot_STU}
 Dataset_col = {'name': r'PS+EW+C', 'data': TableTot_STU_Collid}
 Dataset_bsg = {'name': r'PS+EW+C+bs$\gamma$', 'data': TableTot_STU_Collid_BSG}
 Dataset_unit = {'name': r'PS+EW+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit}
+#Dataset_unit_two = {'name': r'PS+EW+C+bs$\gamma$+PU (2-loop)', 'data': TableTot_STU_Collid_BSG_unit_two}
 
 ####### loading CDF data
 
@@ -94,9 +102,27 @@ if load_CDF:
 #%%                                 Plots
 
 plt.rc('text', usetex=True)
-plt.rc('xtick',labelsize=40)
-plt.rc('ytick',labelsize=40)
-resol = 600
+plt.rcParams.update({
+    'xtick.major.size': 2.5,       # Major tick marker size on x-axis
+    'ytick.major.size': 2.5,       # Major tick marker size on y-axis
+    'xtick.major.width': 0.8,       # Major tick marker size on x-axis
+    'ytick.major.width': 0.8,       # Major tick marker size on y-axis
+    'xtick.minor.size': 1.25,       # Major tick marker size on x-axis
+    'ytick.minor.size': 1.25,       # Major tick marker size on y-axis
+    'xtick.minor.width': 0.65,       # Major tick marker size on x-axis
+    'ytick.minor.width': 0.65,       # Major tick marker size on y-axis
+    'xtick.labelsize': 9,        # Font size for x-axis tick labels
+    'ytick.labelsize': 9,        # Font size for y-axis tick labels
+    'axes.labelsize': 9,         # Font size for x and y axis labels
+    'legend.fontsize': 7,        # Font size for the legend
+    'font.size': 7               # Global font size (text, title, etc.)
+})
+mpl.rc('lines', linewidth=0.8)
+smarker = 1
+
+resol=400
+figsiz = 3.5
+clbsz = 8
 
 def str_to_tex(strg):
     latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\tilde{\kappa}_\lambda$',r'$\bar{\kappa}_\lambda$',r'$\sin{(\beta-\alpha)}$',r'$C_{93}$',r'$C_{94}$',r'$C_{102}$',r'$C_{123}$',r'$C_{140}$']
@@ -148,58 +174,85 @@ def str_to_tex(strg):
     else:
         raise ValueError("Invalid parameter.")
     
-def plotter(param1,param2,*dataset):
 
-    fig, ax = plt.subplots(figsize=(10, 10))
+def plotter_3(param1,param2,param3,*dataset,**kwargs):
     
-    plt.title(latex_model +' '+ latex_alignment,size=20)
-    
-    for tbl in dataset:
-        if param1=='sino':
-            sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
-            plt.scatter(sino,tbl['data'][param2],label=tbl['name'])
-        elif param2=='sino':
-            sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
-            plt.scatter(tbl['data'][param1],sino,label=tbl['name'])
-        else:
-            plt.scatter(tbl['data'][param1],tbl['data'][param2],label=tbl['name'])
-    plt.xlabel(str_to_tex(param1), size=25)
-    plt.xticks(size=20)
-    #plt.xlim(125,900)
-    plt.ylabel(str_to_tex(param2), size=25)
-    plt.yticks(size=20)
-    #plt.ylim(125,900)
-    ax.grid()
-    
-    plt.legend(fontsize=20)
-    
-    plt.show()
+    filename=kwargs.get('filename')
 
-    return 0
-
-def plotter_3(param1,param2,param3,*dataset):
-
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(figsiz, figsiz),dpi=resol)
     
-    plt.title(latex_model +' '+ latex_alignment,size=20)
+    plt.title(latex_model +' '+ latex_alignment,size=8)
     
     for tbl in dataset:
         sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
         proxer=tbl['data'].copy()
         proxer.insert(0,"sino", sino)
         proxer = proxer.sort_values(by=[param3],ascending=True)
-        plt.scatter(proxer[param1],proxer[param2],c=proxer[param3])
+        plt.scatter(proxer[param1],proxer[param2],c=proxer[param3],s=smarker,rasterized=True)
+        plt.legend(title=tbl['name'],title_fontproperties={'weight': 'bold','size': 8})
         
     cbar=plt.colorbar(label=str_to_tex(param3))
-    plt.xlabel(str_to_tex(param1), size=25)
-    plt.xticks(size=20)
-    #plt.xlim(125,900)
-    plt.ylabel(str_to_tex(param2), size=25)
-    plt.yticks(size=20)
-    #plt.ylim(125,900)
+    plt.xlabel(str_to_tex(param1))
+    #plt.xlim(0.98,1.00)
+    plt.ylabel(str_to_tex(param2))
+    #plt.ylim(0,40)
     ax.grid()
-    cbar.ax.tick_params(labelsize=20)  # Change size of tick labels
-    cbar.ax.yaxis.label.set_size(20)   # Change size of colorbar label
+    plt.minorticks_on()
+    plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
+    
+    cbar.ax.tick_params(labelsize=clbsz)  # Change size of tick labels
+    cbar.ax.yaxis.label.set_size(clbsz)   # Change size of colorbar label
+    
+    if filename:
+        fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
+    
+    plt.show()
+
+    return 0
+
+def plotter_3_extra(param1,param2,param3,*dataset,**kwargs):
+
+    filename=kwargs.get('filename')
+
+    fig, ax = plt.subplots(figsize=(figsiz, figsiz),dpi=resol)
+    
+    plt.title(latex_model +' '+ latex_alignment,size=8)
+    
+    tbl=dataset[0]
+    hexbinnin=dataset[1]
+    
+    sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
+    proxer=tbl['data'].copy()
+    proxer.insert(0,"sino", sino)
+    proxer = proxer.sort_values(by=[param3],ascending=True)
+    plt.scatter(proxer[param1],proxer[param2],c=proxer[param3],s=smarker,rasterized=True)    
+
+    cbar=plt.colorbar(label=str_to_tex(param3))
+    
+    sino = np.sin(fcs.beta(hexbinnin['data']['tanb'])-fcs.alpha(hexbinnin['data']['cosa']))
+    proxer=hexbinnin['data'].copy()
+    proxer.insert(0,"sino", sino)
+    
+    #plt.scatter(proxer[param1], proxer[param2], c='r',alpha=0.4,s=.01)
+    sns.kdeplot(x=proxer[param1], y=proxer[param2], levels=[0.015], colors='red', linewidths=1)
+    
+    handles = [
+    Line2D([0], [0], marker='o',color='w', markerfacecolor='k', markersize=5, label=tbl['name']),
+    Line2D([0], [0], color='red', lw=1, label=hexbinnin['name'])
+    ]
+    plt.legend(handles=handles,title_fontproperties={'weight': 'bold','size': 8})
+    plt.xlabel(str_to_tex(param1))
+    plt.xlim(0.98,1.00)
+    plt.ylabel(str_to_tex(param2))
+    plt.ylim(0.8,40)
+    ax.grid()
+    plt.minorticks_on()
+    plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
+    cbar.ax.tick_params(labelsize=clbsz)  # Change size of tick labels
+    cbar.ax.yaxis.label.set_size(clbsz)   # Change size of colorbar label
+    
+    if filename:
+        fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
     
     plt.show()
 
@@ -215,12 +268,12 @@ def plotter_comp(param1,param2,param3,param4,*dataset):
         ratio = tbl['data'][param3]/tbl['data'][param4]
         if param1=='sino':
             sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
-            plt.scatter(sino,tbl['data'][param2],c=ratio)
+            plt.scatter(sino,tbl['data'][param2],c=ratio,s=smarker,rasterized=True)
         elif param2=='sino':
             sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
-            plt.scatter(tbl['data'][param1],sino,c=ratio)
+            plt.scatter(tbl['data'][param1],sino,c=ratio,s=smarker,rasterized=True)
         else:
-            plt.scatter(tbl['data'][param1],tbl['data'][param2],c=ratio)
+            plt.scatter(tbl['data'][param1],tbl['data'][param2],c=ratio,s=smarker,rasterized=True)
     cbar=plt.colorbar(label=str_to_tex(param3)+'/'+str_to_tex(param4))
     plt.xlabel(str_to_tex(param1), size=25)
     plt.xticks(size=20)
@@ -236,63 +289,110 @@ def plotter_comp(param1,param2,param3,param4,*dataset):
 
     return 0
 
-def plotter_diff(param1,param2,param3,param4,*dataset,alph=1):
+def plotter_diff(param1,param2,param3,param4,*dataset,alph=1,**kwargs):
     
-    colors = ['firebrick','royalblue','khaki','aquamarine','yellowgreen']
+    filename=kwargs.get('filename')
+    
+    #colors = ['firebrick','royalblue','khaki','aquamarine','yellowgreen']
 
-    fig, ax = plt.subplots(figsize=(10, 10),dpi=resol)
+    fig, ax = plt.subplots(figsize=(figsiz, figsiz),dpi=resol)
     
-    plt.title(latex_model +' '+ latex_alignment,size=20)
+    plt.title(latex_model +' '+ latex_alignment,size=8)
     
     for i,tbl in enumerate(dataset):
-        plt.scatter(tbl['data'][param1]-tbl['data'][param2],tbl['data'][param3]-tbl['data'][param4],label=tbl['name'],alpha=alph**i,c=colors[i])
+        plt.scatter(tbl['data'][param1]-tbl['data'][param2],tbl['data'][param3]-tbl['data'][param4],label=tbl['name'],alpha=alph**i,s=smarker,rasterized=True)
         
-    plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2), size=25)
-    plt.xticks(size=20)
-    #plt.xlim(-450,200)
-    plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4), size=25)
-    plt.yticks(size=20)
-    #plt.ylim(-350,350)
+    plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2))
+    #plt.ylim(-75,720)
+    plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4))
+    #plt.xlim(-270,520)
     ax.grid()
     plt.minorticks_on()
     plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
+    ax.set_xticks([-250,0,250,500])
+    ax.set_yticks([0,250,500,750])
     
-    plt.legend(loc='upper left',fontsize=20)
+    plt.legend(loc='upper left')
     
-    plt.savefig('../temp/Comp_'+THDM_type+strgl5+'-'+strga+'.pdf', dpi=400, bbox_inches='tight')
+    if filename:
+        fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
     
     plt.show()
 
     return 0
 
-def plotter_diff_color(param1,param2,param3,param4,param5,*dataset):
-
-    fig, ax = plt.subplots(figsize=(10, 10),dpi=resol)
+def plotter_diff_contour(param1,param2,param3,param4,*dataset,**kwargs):
     
-    plt.title(latex_model +' '+ latex_alignment,size=25)
+    colors = ['b','orange','g','r']
+    
+    filename = kwargs.get('filename')
+
+    fig, ax = plt.subplots(figsize=(figsiz, figsiz),dpi=resol)
+    
+    plt.title(latex_model +' '+ latex_alignment,size=8)
+    
+    handles = []
+    for i,tbl in enumerate(dataset):
+        #plt.scatter(tbl['data'][param1]-tbl['data'][param2],tbl['data'][param3]-tbl['data'][param4],label=tbl['name'],alpha=0.1)
+        sns.kdeplot(x=tbl['data'][param1]-tbl['data'][param2], y=tbl['data'][param3]-tbl['data'][param4], levels=[0.015], colors=colors[i], linewidths=1)
+        
+        handles.append(
+        Line2D([0], [0], color=colors[i], lw=1, label=tbl['name'])
+        )
+    plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2))
+    #plt.ylim(-75,720)
+    plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4))
+    #plt.xlim(-270,520)
+    ax.grid()
+    plt.minorticks_on()
+    plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
+    
+    ax.set_xticks([-250,0,250,500])
+    ax.set_yticks([0,250,500,750])
+    
+    plt.legend(handles=handles,loc='upper left')
+    
+    if filename:
+        fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
+    
+    plt.show()
+
+    return 0
+
+def plotter_diff_color(param1,param2,param3,param4,param5,*dataset,**kwargs):
+    
+    filename=kwargs.get('filename')
+
+    fig, ax = plt.subplots(figsize=(figsiz, figsiz),dpi=resol)
+    
+    plt.title(latex_model +' '+ latex_alignment,size=8)
     
     for tbl in dataset:
         sino = np.sin(fcs.beta(tbl['data']['tanb'])-fcs.alpha(tbl['data']['cosa']))
         proxer=tbl['data'].copy()
         proxer.insert(0,"sino", sino)
         proxer = proxer.sort_values(by=[param5],ascending=True)
-        plt.scatter(proxer[param1]-proxer[param2],proxer[param3]-proxer[param4],c=proxer[param5])
-        plt.legend(fontsize=20, title=tbl['name'],title_fontproperties={'weight': 'bold','size': 25})
+        plt.scatter(proxer[param1]-proxer[param2],proxer[param3]-proxer[param4],c=proxer[param5],s=smarker,rasterized=True)
+        plt.legend(title=tbl['name'],title_fontproperties={'weight': 'bold','size': 8})
         
     cbar=plt.colorbar(label=str_to_tex(param5))
-    plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2), size=25)
-    plt.xticks(size=25)
-    #plt.xlim(-450,200)
-    plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4), size=25)
-    plt.yticks(size=25)
-    #plt.ylim(-320,350)
+    #cbar.ax.axhline(2.6, c='r')
+    plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2))
+    #plt.xlim(-300,520)
+    plt.ylabel(str_to_tex(param3).replace(' [GeV]','')+'-'+str_to_tex(param4))
+    #plt.ylim(-80,700)
     ax.grid()
-    cbar.ax.tick_params(labelsize=25)  # Change size of tick labels
-    cbar.ax.yaxis.label.set_size(25)   # Change size of colorbar label
+    cbar.ax.tick_params(labelsize=clbsz)  # Change size of tick labels
+    cbar.ax.yaxis.label.set_size(clbsz)   # Change size of colorbar label
     plt.minorticks_on()
     plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
+    #ax.set_xticks([-250,0,250,500])
+    #ax.set_yticks([0,250,500,750])
+    #ax.set_xticks([-100,0,100,200])
+    #ax.set_yticks([0,50,100,150,200,250])
     
-    plt.savefig('../temp/Colormap_'+param5+THDM_type+strgl5+'-'+strga+'.pdf', dpi=400, bbox_inches='tight')
+    if filename:
+        fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
     
     plt.show()
 
@@ -302,14 +402,14 @@ def plotter_diff_comp(param1,param2,param3,param4,param5,param6,*dataset):
 
     fig, ax = plt.subplots(figsize=(10, 10),dpi=resol)
     
-    plt.title(latex_model +' '+ latex_alignment,size=20)
+    plt.title(latex_model +' '+ latex_alignment,size=8)
     
     for tbl in dataset:
         ratio = tbl['data'][param5]/tbl['data'][param6]
         proxer=tbl['data'].copy()
         proxer.insert(0,"ratio", ratio)
         proxer = proxer.sort_values(by=['ratio'],ascending=True)
-        plt.scatter(proxer[param1]-proxer[param2],proxer[param3]-proxer[param4],c=proxer['ratio'])
+        plt.scatter(proxer[param1]-proxer[param2],proxer[param3]-proxer[param4],c=proxer['ratio'],s=smarker,rasterized=True)
     cbar=plt.colorbar(label=str_to_tex(param5)+'/'+str_to_tex(param6))
     plt.xlabel(str_to_tex(param1).replace(' [GeV]','')+'-'+str_to_tex(param2), size=25)
     plt.xticks(size=20)
@@ -350,22 +450,6 @@ def plotter_diff_comp(param1,param2,param3,param4,param5,param6,*dataset):
 # plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
 # plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg)
 
-#%%%    
-
-#TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
-
-# for cs in ['c93','c94','c102','c123','c140']:
-#     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
-#     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
-
-#TableTot_STU_Collid_BSG_unit = pd.concat([TableTot_STU_Collid_BSG_unit,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit)).T,columns=['a0'])],axis=1)
-
-#cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit['a0'])
-#TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
-    
-
-#%%
-
 # plotter_diff_color('mH','mHpm','mA','mHpm','kappa',Dataset_unit)
 # plotter_diff_color('mH','mHpm','mA','mHpm','tanb',Dataset_unit)
 # plotter_diff('mH','mHpm','mA','mHpm',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
@@ -385,8 +469,6 @@ def plotter_diff_comp(param1,param2,param3,param4,param5,param6,*dataset):
 # plotter('l3','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
 # plotter('l4','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
 # plotter('l5','kappa',Dataset_teo,Dataset_stu,Dataset_col,Dataset_bsg,Dataset_unit)
-
-#%%%
 # plotter('c93','kappa',Dataset_unit)
 # plotter('c94','kappa',Dataset_unit)
 # plotter('c102','kappa',Dataset_unit)
@@ -395,78 +477,54 @@ def plotter_diff_comp(param1,param2,param3,param4,param5,param6,*dataset):
 
 #%%
 
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_unit)
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_unit,filename='Kappa_final')
 plotter_diff_color('mHpm','M','mA','M','kappa',Dataset_unit)
-plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit)
+plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit,filename='tanb_final')
 plotter_diff_color('mHpm','M','mA','M','tanb',Dataset_unit)
-
-#%%
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_unit_cdf)
-plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit_cdf)
 
 #%%
 
 if load_CDF:
 
+    plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_unit_cdf,filename='Kappa_final-CDF')
+    plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit_cdf,filename='tanb_final-CDF')
+
     plotter_diff('mH','mHpm','mA','mHpm',Dataset_stu,Dataset_stu_comb,Dataset_stu_cdf)
     plotter_diff('mH','mHpm','mA','mHpm',Dataset_stu_cdf)
-    
-#%%                 Recalculating CDF and Comb PU
-
-# TableTot_STU_Collid_BSG_unit_CDF= pd.concat([TableTot_STU_Collid_BSG_CDF,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG_CDF))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
-
-# for cs in ['c93','c94','c102','c123','c140']:
-#     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
-#     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
-
-# TableTot_STU_Collid_BSG_unit_CDF = pd.concat([TableTot_STU_Collid_BSG_unit_CDF,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit_CDF)).T,columns=['a0'])],axis=1)
-
-# cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit_CDF['a0'])
-# TableTot_STU_Collid_BSG_unit_CDF = TableTot_STU_Collid_BSG_unit_CDF.drop(TableTot_STU_Collid_BSG_unit_CDF[cnd].index)
-
-#%%
-
-# TableTot_STU_Collid_BSG_unit_Comb= pd.concat([TableTot_STU_Collid_BSG_Comb,pd.DataFrame(np.abs(np.array(spr.calculate_quartics(TableTot_STU_Collid_BSG_Comb))).T,columns=['c93','c94','c102','c123','c140'])],axis=1)
-
-# for cs in ['c93','c94','c102','c123','c140']:
-#     cnd = spr.perturbative_unitarity_const(TableTot_STU_Collid_BSG_unit[cs])
-#     TableTot_STU_Collid_BSG_unit = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
-
-# TableTot_STU_Collid_BSG_unit_Comb = pd.concat([TableTot_STU_Collid_BSG_unit_Comb,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot_STU_Collid_BSG_unit_Comb)).T,columns=['a0'])],axis=1)
-
-# cnd = spr.perturbative_unitarity_const_a0(TableTot_STU_Collid_BSG_unit_Comb['a0'])
-# TableTot_STU_Collid_BSG_unit_Comb = TableTot_STU_Collid_BSG_unit_Comb.drop(TableTot_STU_Collid_BSG_unit_Comb[cnd].index)
 
 
 #%%                             Obtaining the constraints parameter space
 
-# TableTot_unit = pd.concat([TableTot,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot)).T,columns=['a0'])],axis=1)
-
-# cnd = spr.perturbative_unitarity_const_a0(TableTot_unit['a0'])
-# TableTot_true_teo = TableTot_unit.drop(TableTot_unit[cnd].index)
-
-# TableTot_true_teo.to_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv',index=False)
+if Calculate_Teo:
+    TableTot_unit = pd.concat([TableTot,pd.DataFrame(np.array(spr.calculate_eigenvalues(TableTot)).T,columns=['a0'])],axis=1)
+    
+    cnd = spr.perturbative_unitarity_const_a0(TableTot_unit['a0'])
+    TableTot_true_teo = TableTot_unit.drop(TableTot_unit[cnd].index)
+    
+    TableTot_true_teo.to_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv',index=False)
 
 #%%
 
-TableTot_true_teo = pd.read_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv')
-
-Dataset_true_teo = {'name': r'T', 'data': TableTot_true_teo}
+if Load_Teo:
+    TableTot_true_teo = pd.read_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv')
+    
+    Dataset_true_teo = {'name': r'T', 'data': TableTot_true_teo}
 
 #%%                                 Theoretical
 
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_teo)
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_true_teo)
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_teo,filename='Kappa_mHpm_x_mH_M_331lk_PS')
+if Load_Teo:
+    plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_true_teo,filename='Kappa_mHpm_x_mH_M_331lk_teo')
 
 #%%                                 STU
 
 Dataset_stu_only = {'name': r'EW', 'data': TableTot_STU}
-Dataset_stu_only_cdf = {'name': r'EW (CDF)', 'data': TableTot_STU_CDF}
+if load_CDF:
+    Dataset_stu_only_cdf = {'name': r'EW (CDF)', 'data': TableTot_STU_CDF}
+    plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_stu_only_cdf,filename='Kappa_mHpm_x_mH_M_331lk_stu_cdf')
+    plotter_diff('mHpm','M','mH','M',Dataset_stu_only,Dataset_stu_only_cdf,filename='stu_Constraints_comp')
 
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_stu_only)
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_stu_only_cdf)
-
-plotter_diff('mHpm','M','mH','M',Dataset_stu_only,Dataset_stu_only_cdf)
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_stu_only,filename='Kappa_mHpm_x_mH_M_331lk_stu')
 
 
 #%%                                 Collider
@@ -483,7 +541,9 @@ TableTot_Collid = TableTot_Collid.drop(TableTot_Collid[cnd].index)
 
 Dataset_collid_only = {'name': r'C', 'data': TableTot_Collid}
 
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_collid_only)
+#%%
+
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_collid_only,filename='Kappa_mHpm_x_mH_M_331lk_coll')
 
 #%%                                 BSG
 
@@ -492,13 +552,25 @@ TableTot_BSG = TableTot.drop(TableTot[cnd].index)
 
 Dataset_bsg_only = {'name': r'bs$\gamma$', 'data': TableTot_BSG}
 
-plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_bsg_only)
+plotter_diff_color('mHpm','M','mH','M','kappa',Dataset_bsg_only,filename='Kappa_mHpm_x_mH_M_331lk_bsg')
 
 #%%         
 
-plotter_diff('mHpm','M','mH','M',Dataset_true_teo,alph=0.8)
-plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,alph=0.8)
-plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,Dataset_bsg_only,alph=0.8)
-plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,Dataset_bsg_only,Dataset_stu_only,alph=0.8)
+if Load_Teo:
+    plotter_diff('mHpm','M','mH','M',Dataset_true_teo,alph=0.8)
+    plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,alph=0.8)
+    plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,Dataset_bsg_only,alph=0.8)
+    plotter_diff('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,Dataset_bsg_only,Dataset_stu_only,filename='Constraints_comp')
 
-#plotter_diff('mHpm','M','mH','M',Dataset_teo,Dataset_true_teo)
+    plotter_diff_contour('mHpm','M','mH','M',Dataset_true_teo,Dataset_collid_only,Dataset_bsg_only,Dataset_stu_only,filename='Constraints_comp_1')
+
+    plotter_diff('mHpm','M','mH','M',Dataset_teo,Dataset_true_teo,filename='Teo_Constraints_comp')
+
+#%%                                 Sin x tanb
+
+plotter_3('sino', 'tanb', 'kappa', Dataset_col,filename='Col_everything')
+plotter_3('sino', 'tanb', 'kappa', Dataset_collid_only)
+plotter_3('sino', 'tanb', 'kappa', Dataset_teo)
+#%%
+
+plotter_3_extra('sino', 'tanb', 'kappa', Dataset_teo,Dataset_collid_only,filename='Theoretical_Col_comp')
