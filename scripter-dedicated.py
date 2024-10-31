@@ -13,8 +13,8 @@ import numpy as np
 from pathlib import Path
 from time import time
 
-Number_of_datasets = 1  
-Numer_of_points = 3e7
+Number_of_datasets = 40
+Numer_of_points = 5e5
 
 if fcs.alignment:
     strga = 'A'

@@ -8,10 +8,10 @@ import pandas as pd
 import numpy as np
 
 alignment = False
-small_l5 = True
+small_l5 = False
 l5_size_max = 1e-8
 non_alignment_max = 0.2
-THDM_type='II'
+THDM_type=''
 MW = 'PDG 2024'
 
 ### ---------      SM param
@@ -33,16 +33,16 @@ mh = mhSM
 #mA_min = 125
 #mA_max = 1500
 mA_min = 600
-mA_max = 900
+mA_max = 1200
 
 #mH_min = 125
 #mH_max = 1500
-mH_min = 800
+mH_min = 600
 mH_max = 1200
 
 #mHpm_min = 125
 #mHpm_max = 1500
-mHpm_min = 800
+mHpm_min = 600
 mHpm_max = 1200
 
 cosa_min = -1

@@ -17,13 +17,14 @@ from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
 #%%%                                Model parameters to load
-THDM_type = 'II'
-small_l5 = True
-alignment = False
+THDM_type = ''
+small_l5 = False
+alignment = True
 non_alignment_max = 0.2
 load_CDF = False
 Calculate_Teo = False
 Load_Teo = False
+TwoLoop = True
 
 ######## loading
 
@@ -58,14 +59,16 @@ TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU
 TableTot_STU_Collid = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv')
 TableTot_STU_Collid_BSG = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv')
 TableTot_STU_Collid_BSG_unit = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG.csv')
-#TableTot_STU_Collid_BSG_unit_two = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG_kappa.csv')
+if TwoLoop:
+    TableTot_STU_Collid_BSG_unit_two = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG_kappa.csv')
 
 Dataset_teo = {'name': r'PS', 'data': TableTot}
 Dataset_stu = {'name': r'PS+EW', 'data': TableTot_STU}
 Dataset_col = {'name': r'PS+EW+C', 'data': TableTot_STU_Collid}
 Dataset_bsg = {'name': r'PS+EW+C+bs$\gamma$', 'data': TableTot_STU_Collid_BSG}
 Dataset_unit = {'name': r'PS+EW+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit}
-#Dataset_unit_two = {'name': r'PS+EW+C+bs$\gamma$+PU (2-loop)', 'data': TableTot_STU_Collid_BSG_unit_two}
+if TwoLoop:
+    Dataset_unit_two = {'name': r'PS+EW+C+bs$\gamma$+PU', 'data': TableTot_STU_Collid_BSG_unit_two}
 
 ####### loading CDF data
 
@@ -125,7 +128,7 @@ figsiz = 3.5
 clbsz = 8
 
 def str_to_tex(strg):
-    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\tilde{\kappa}_\lambda$',r'$\bar{\kappa}_\lambda$',r'$\sin{(\beta-\alpha)}$',r'$C_{93}$',r'$C_{94}$',r'$C_{102}$',r'$C_{123}$',r'$C_{140}$']
+    latex_parameters = [r'$m_A$ [GeV]',r'$m_H$ [GeV]',r'$m_{H^\pm}$ [GeV]',r'$\cos{\alpha}$',r'$\tan{\beta}$',r'$M$ [GeV]',r'$m_{12}^2$ [GeV$^2$]', r'$\lambda_1$', r'$\lambda_2$', r'$\lambda_3$', r'$\lambda_4$', r'$\lambda_5$',r'$\kappa_\lambda$',r'$\kappa_\lambda^{(0)}$',r'$\tilde{\kappa}_\lambda$',r'$\bar{\kappa}_\lambda$',r'$\sin{(\beta-\alpha)}$',r'$C_{93}$',r'$C_{94}$',r'$C_{102}$',r'$C_{123}$',r'$C_{140}$', r'$\kappa_{\lambda}^{\rm{NNLO}}$', r'$\kappa_{\lambda}^{\rm{NNLO}}/\kappa_\lambda^{\rm{NLO}}$']
     
     if strg=='mA':
         return latex_parameters[0]
@@ -171,6 +174,10 @@ def str_to_tex(strg):
         return latex_parameters[20]
     elif strg=='c140':
         return latex_parameters[21]
+    elif strg=='k NNLO':
+        return latex_parameters[22]
+    elif strg=='k2/k1':
+        return latex_parameters[23]
     else:
         raise ValueError("Invalid parameter.")
     
@@ -373,7 +380,7 @@ def plotter_diff_color(param1,param2,param3,param4,param5,*dataset,**kwargs):
         proxer.insert(0,"sino", sino)
         proxer = proxer.sort_values(by=[param5],ascending=True)
         plt.scatter(proxer[param1]-proxer[param2],proxer[param3]-proxer[param4],c=proxer[param5],s=smarker,rasterized=True)
-        plt.legend(title=tbl['name'],title_fontproperties={'weight': 'bold','size': 8})
+        plt.legend(title=tbl['name'],title_fontproperties={'weight': 'bold','size': 8},loc='upper left')
         
     cbar=plt.colorbar(label=str_to_tex(param5))
     #cbar.ax.axhline(2.6, c='r')
@@ -388,8 +395,10 @@ def plotter_diff_color(param1,param2,param3,param4,param5,*dataset,**kwargs):
     plt.tick_params(axis='both', which='both', right=True, top=True, direction='in')
     #ax.set_xticks([-250,0,250,500])
     #ax.set_yticks([0,250,500,750])
-    #ax.set_xticks([-100,0,100,200])
+    #ax.set_xticks([-50,0,50,100,150,200,250])
     #ax.set_yticks([0,50,100,150,200,250])
+    #ax.set_xticks([-100,-50,0,50,100,150])
+    #ax.set_yticks([-50,0,-150,-100,-50,0,50,100])
     
     if filename:
         fig.savefig("../Figs/"+filename+".pdf",format='pdf',dpi=resol,bbox_inches='tight')
@@ -482,6 +491,15 @@ plotter_diff_color('mHpm','M','mA','M','kappa',Dataset_unit)
 plotter_diff_color('mHpm','M','mH','M','tanb',Dataset_unit,filename='tanb_final')
 plotter_diff_color('mHpm','M','mA','M','tanb',Dataset_unit)
 
+if TwoLoop:
+    plotter_diff_color('mHpm','M','mH','M','k NNLO',Dataset_unit_two,filename='Kappa_2loop_MH'+THDM_type+strgl5)
+    plotter_diff_color('mHpm','M','mA','M','k NNLO',Dataset_unit_two,filename='Kappa_2loop_MA'+THDM_type+strgl5)
+    plotter_diff_color('mHpm','M','mH','M','k2/k1',Dataset_unit_two,filename='Kappa_2loop_MH_ratio'+THDM_type+strgl5)
+    plotter_diff_color('mHpm','M','mA','M','k2/k1',Dataset_unit_two,filename='Kappa_2loop_MA_ratio'+THDM_type+strgl5)
+    
+    plotter_diff_color('mH','mHpm','mA','mHpm','k NNLO',Dataset_unit_two, filename='Weiglein_2loop'+THDM_type+strgl5)
+    plotter_diff_color('mH','mHpm','mA','mHpm','k2/k1',Dataset_unit_two, filename='Weiglein_2loop_ratio'+THDM_type+strgl5)
+
 #%%
 
 if load_CDF:
@@ -501,12 +519,12 @@ if Calculate_Teo:
     cnd = spr.perturbative_unitarity_const_a0(TableTot_unit['a0'])
     TableTot_true_teo = TableTot_unit.drop(TableTot_unit[cnd].index)
     
-    TableTot_true_teo.to_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv',index=False)
+    TableTot_true_teo.to_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv',index=False)
 
 #%%
 
 if Load_Teo:
-    TableTot_true_teo = pd.read_csv('./THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv')
+    TableTot_true_teo = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'_true_teo.csv')
     
     Dataset_true_teo = {'name': r'T', 'data': TableTot_true_teo}
 

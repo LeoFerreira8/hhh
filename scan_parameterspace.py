@@ -17,6 +17,16 @@ from scipy import stats
 from time import time
 from pathlib import Path
 
+def progress_bar(current, total, bar_length=20):
+    fraction = current / total
+
+    arrow = int(fraction * bar_length - 1) * '-' + '>'
+    padding = int(bar_length - len(arrow)) * ' '
+
+    ending = '\n' if current == total else '\r'
+
+    print(f'\r Progress: [{arrow}{padding}] {int(fraction*100)}%', end=ending)
+
 s_mean = -0.05
 δs = 0.07
 
@@ -63,7 +73,10 @@ def stability_bounds(l_a):
 
 def Spheno_Higgstools_calc_(SPheno_input):
     outpt=pd.DataFrame()
+    prog = 1
+    tot = SPheno_input.shape[0]
     for index, row in SPheno_input.iterrows():
+        progress_bar(prog, tot)
         SPfcs.write_spheno_LHA(list(row))
         success = SPfcs.execute_spheno()
         if success:
@@ -80,7 +93,9 @@ def Spheno_Higgstools_calc_(SPheno_input):
                 print('Calculation of %d successful.' %index)
             else:
                 print('Failed')
-            
+
+        prog+=1                
+                
     outpt = outpt.drop_duplicates()
     
     return outpt
@@ -180,17 +195,25 @@ def calculate_lambda(DtFrame):
     else:
         THDM2 = anyBSM(THDM_type, scheme_name = 'OS')
 
+    prog = 1
+    tot = DtFrame.shape[0]
     for i in DtFrame.index:
         if not fcs.alignment and sino[i]==1.0:
             THDM2.load_renormalization_scheme('OSalignment')
             
-        THDM2.setparameters({'Mh2': DtFrame.at[i,'mH'], 'MAh2': DtFrame.at[i,'mA'], 'MHm2': DtFrame.at[i,'mHpm'], 'TanBeta': DtFrame.at[i,'tanb'], 'SinBmA': sino[i],'M': DtFrame.at[i,'M'], 'MWm': fcs.MW, 'MWp': fcs.MW}) #Define new mass in anyBSM
+        progress_bar(prog, tot)
+        if THDM_type == 'THDMII':
+            WmassStd = 'MWp'
+        else:
+            WmassStd = 'MWm'
+        THDM2.setparameters({'Mh2': DtFrame.at[i,'mH'], 'MAh2': DtFrame.at[i,'mA'], 'MHm2': DtFrame.at[i,'mHpm'], 'TanBeta': DtFrame.at[i,'tanb'], 'SinBmA': sino[i],'M': DtFrame.at[i,'M'], WmassStd: fcs.MW}) #Define new mass in anyBSM
         THDM2.progress=False
         THDM2.warnSSSS=False
         dic = THDM2.lambdahhh()
         lamb.append(-np.real(dic['total'])/fcs.Gammahhh_treelevel(0, 0))  #Recalculate lambda
         lambtree.append(-np.real(dic['treelevel'])/fcs.Gammahhh_treelevel(0, 0))  #Recalculate lambda
-        
+    
+        prog+=1
     return lamb, lambtree
 
 def calculate_quartics(DtFrame):
@@ -220,12 +243,15 @@ def calculate_eigenvalues(DtFrame):
         
     THDM2.progress=False
     THDM2.warnSSSS=False
-    
+    if THDM_type == 'THDMII':
+        WmassStd = 'MWp'
+    else:
+        WmassStd = 'MWm'
     for i in DtFrame.index:
         if not fcs.alignment and sino[i]==1.0:
             THDM2.load_renormalization_scheme('OSalignment')
             
-        a0.append(THDM2.eigSSSS(parameters={'Mh2': DtFrame.at[i,'mH'], 'MAh2': DtFrame.at[i,'mA'], 'MHm2': DtFrame.at[i,'mHpm'], 'TanBeta': DtFrame.at[i,'tanb'], 'SinBmA': sino[i],'M': DtFrame.at[i,'M'], 'MWm': fcs.MW, 'MWp': fcs.MW}))
+        a0.append(THDM2.eigSSSS(parameters={'Mh2': DtFrame.at[i,'mH'], 'MAh2': DtFrame.at[i,'mA'], 'MHm2': DtFrame.at[i,'mHpm'], 'TanBeta': DtFrame.at[i,'tanb'], 'SinBmA': sino[i],'M': DtFrame.at[i,'M'], WmassStd: fcs.MW}))
 
     return a0
 

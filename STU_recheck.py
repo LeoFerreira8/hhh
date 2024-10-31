@@ -72,7 +72,7 @@ if small_l5:
 else:
     strgl5 = ''
 
-set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'-D/'
+set_dir = 'data_'+'THDM'+THDM_type+strgl5+'-'+strga+'/'
 
 #TableTot = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Theo_PDG.csv')
 TableTot_STU = pd.read_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU_PDG.csv')
@@ -90,14 +90,35 @@ proxies3 = []
 cnd = spr.STU_constraint(TableTot_STU['S-parameter (1-loop BSM)'],TableTot_STU['T-parameter (1-loop BSM)'],TableTot_STU['U-parameter (1-loop BSM)'])
 proxies = TableTot_STU.drop(TableTot_STU[cnd].index)
 
-# if not proxies.empty:
-#     cnd = spr.collider_const(proxies[i]['HiggsB'])
-#     proxies1.append(proxies[i].drop(proxies[i][cnd].index))
-# else:
-#     proxies1.append(proxies[i])
+cnd = spr.STU_constraint(TableTot_STU_Collid['S-parameter (1-loop BSM)'],TableTot_STU_Collid['T-parameter (1-loop BSM)'],TableTot_STU_Collid['U-parameter (1-loop BSM)'])
+proxies1 = TableTot_STU_Collid.drop(TableTot_STU_Collid[cnd].index)
 
-#     #%%                                 Impose bounds from HiggsSignals
-    
-# if not proxies1[i].empty:
-#     cnd = spr.signals_const(np.array(proxies1[i]['HiggsS'],dtype=float))
-#     proxies1[i] = proxies1[i].drop(proxies1[i][cnd].index)
+cnd = spr.STU_constraint(TableTot_STU_Collid_BSG['S-parameter (1-loop BSM)'],TableTot_STU_Collid_BSG['T-parameter (1-loop BSM)'],TableTot_STU_Collid_BSG['U-parameter (1-loop BSM)'])
+proxies2 = TableTot_STU_Collid_BSG.drop(TableTot_STU_Collid_BSG[cnd].index)
+
+cnd = spr.STU_constraint(TableTot_STU_Collid_BSG_unit['S-parameter (1-loop BSM)'],TableTot_STU_Collid_BSG_unit['T-parameter (1-loop BSM)'],TableTot_STU_Collid_BSG_unit['U-parameter (1-loop BSM)'])
+proxies3 = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+
+TableTot_STU = proxies
+TableTot_STU_Collid = proxies1
+TableTot_STU_Collid_BSG = proxies2
+TableTot_STU_Collid_BSG_unit = proxies3
+
+cnd = spr.signals_const(np.array(TableTot_STU_Collid['HiggsS'],dtype=float))
+proxies1 = TableTot_STU_Collid.drop(TableTot_STU_Collid[cnd].index)
+
+cnd = spr.signals_const(np.array(TableTot_STU_Collid_BSG['HiggsS'],dtype=float))
+proxies2 = TableTot_STU_Collid_BSG.drop(TableTot_STU_Collid_BSG[cnd].index)
+
+cnd = spr.signals_const(np.array(TableTot_STU_Collid_BSG_unit['HiggsS'],dtype=float))
+proxies3 = TableTot_STU_Collid_BSG_unit.drop(TableTot_STU_Collid_BSG_unit[cnd].index)
+
+TableTot_STU = proxies
+TableTot_STU_Collid = proxies1
+TableTot_STU_Collid_BSG = proxies2
+TableTot_STU_Collid_BSG_unit = proxies3
+
+TableTot_STU.to_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-STU_PDG.csv',index=False)
+TableTot_STU_Collid.to_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-Collid_PDG.csv',index=False)
+TableTot_STU_Collid_BSG.to_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-BSG_PDG.csv',index=False)
+TableTot_STU_Collid_BSG_unit.to_csv('./'+set_dir+'/THDM'+THDM_type+strgl5+'-'+strga+'-PU_PDG.csv',index=False)
